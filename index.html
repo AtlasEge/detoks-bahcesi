@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Detoks Bahçesi 🌱 Dijital Bağımlılıktan Kurtuluş</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#0b1d2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Detoks Bahçesi">
+<style>
+:root{
+  --sky1:#0b1d2b; --sky2:#123441; --sky3:#1a4a4a;
+  --hill1:#1b4436; --hill2:#16382d; --hill3:#102a22;
+  --card:#132b33; --card2:#0e2229; --line:#1f4550;
+  --txt:#dcefe6; --dim:#8fb3a8; --leaf:#7ed491; --amber:#ffd28a;
+  --warn:#e8a15f; --bad:#e07a6b; --moon:#f5e9c9;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif; color:var(--txt);
+  background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 45%,var(--sky3) 100%);
+  min-height:100vh;
+}
+.wrap{
+  max-width:1080px;margin:0 auto;
+  padding:calc(14px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))
+}
+
+/* ---------- HEADER ---------- */
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:10px 4px 16px}
+.logo h1{font-size:1.45rem;letter-spacing:.5px}
+.logo p{color:var(--dim);font-size:.8rem;margin-top:2px}
+.hstats{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;align-items:center}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:7px 14px;text-align:center;min-width:74px}
+.chip b{display:block;font-size:1.05rem;color:var(--leaf)}
+.chip span{font-size:.68rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.chip.fire b{color:var(--amber)}
+.lvlbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:7px 14px;min-width:150px}
+.lvlbox .t{display:flex;justify-content:space-between;font-size:.72rem;color:var(--dim);margin-bottom:4px}
+.lvlbox .t b{color:var(--txt)}
+.bar{height:8px;background:#0a1a20;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#3fae7a,var(--leaf));transition:width .6s}
+
+/* ---------- TABS ---------- */
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+nav button{
+  background:var(--card2);color:var(--dim);border:1px solid var(--line);border-radius:12px;
+  padding:9px 16px;font-size:.9rem;cursor:pointer;transition:.2s;font-family:inherit
+}
+nav button:hover{color:var(--txt)}
+nav button.on{background:var(--card);color:var(--leaf);border-color:var(--leaf)}
+section{display:none;animation:fadein .35s}
+section.on{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- CARDS ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+.card h2{font-size:1.02rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.muted{color:var(--dim);font-size:.85rem;line-height:1.5}
+
+/* ---------- GARDEN ---------- */
+.gardenBox{border-radius:20px;overflow:hidden;border:1px solid var(--line);position:relative;background:#08141c}
+#gardenSvg{display:block;width:100%;height:auto}
+.quote{
+  text-align:center;color:var(--dim);font-style:italic;font-size:.9rem;
+  padding:14px 20px 4px;min-height:44px;transition:opacity .8s
+}
+.quickrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:12px 0 4px}
+.star{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.2}50%{opacity:1}}
+.fly{animation:flyf 6s ease-in-out infinite}
+@keyframes flyf{0%,100%{opacity:0;transform:translate(0,0)}25%{opacity:.9}50%{opacity:.15;transform:translate(14px,-10px)}75%{opacity:.8}}
+.plant-new{animation:grow 1.3s cubic-bezier(.34,1.56,.64,1) both;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes grow{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* ---------- BUTTONS / INPUTS ---------- */
+.btn{
+  background:linear-gradient(135deg,#2a7a55,#3fae7a);color:#eafff3;border:none;border-radius:12px;
+  padding:11px 20px;font-size:.95rem;cursor:pointer;font-family:inherit;font-weight:600;
+  transition:transform .15s,filter .15s
+}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.btn.big{font-size:1.1rem;padding:15px 28px;border-radius:16px}
+.btn.wave{background:linear-gradient(135deg,#2b5f8a,#3f8cae)}
+.btn.ghost{background:var(--card2);color:var(--dim);border:1px solid var(--line)}
+.btn.danger{background:linear-gradient(135deg,#8a3b2b,#b0563f)}
+input[type=number],select,textarea{
+  background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;
+  padding:10px 12px;font-size:1rem;font-family:inherit;width:100%
+}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--leaf)}
+label.f{display:block;font-size:.78rem;color:var(--dim);margin:10px 0 5px;text-transform:uppercase;letter-spacing:.5px}
+.timerow{display:flex;gap:10px;align-items:center}
+.timerow input{width:90px;text-align:center;font-size:1.3rem}
+.timerow span{color:var(--dim)}
+
+/* ---------- TODAY ---------- */
+.targetBig{text-align:center;padding:8px 0 14px}
+.targetBig .v{font-size:2.2rem;font-weight:700;color:var(--amber)}
+.targetBig .l{color:var(--dim);font-size:.82rem;margin-top:2px}
+.statusMsg{border-radius:12px;padding:12px 14px;margin-top:12px;font-size:.92rem;display:none;line-height:1.45}
+.statusMsg.ok{display:block;background:#12352a;border:1px solid #2a7a55;color:#b8f0cf}
+.statusMsg.over{display:block;background:#3a2a1a;border:1px solid #8a6b3b;color:#ffe1b0}
+.chItem{
+  display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--line);
+  border-radius:12px;padding:11px 14px;margin-bottom:8px;cursor:pointer;transition:.2s;user-select:none
+}
+.chItem:hover{border-color:var(--leaf)}
+.chItem.done{border-color:#2a7a55;background:#12352a}
+.chItem.done .tx{text-decoration:line-through;color:var(--dim)}
+.chItem .box{
+  width:24px;height:24px;border-radius:7px;border:2px solid var(--dim);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#0a1a12
+}
+.chItem.done .box{background:var(--leaf);border-color:var(--leaf)}
+.chItem .tx{font-size:.92rem}
+
+/* ---------- URGE ---------- */
+.urgeCenter{text-align:center;padding:16px 0}
+.tips{list-style:none;margin-top:6px}
+.tips li{padding:8px 0 8px 4px;border-bottom:1px dashed var(--line);font-size:.9rem;color:var(--dim)}
+.tips li:last-child{border:none}
+.tips li b{color:var(--txt)}
+#breathOverlay{
+  position:fixed;inset:0;background:rgba(4,14,20,.96);z-index:60;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;padding:20px
+}
+#breathOverlay.on{display:flex}
+.bCircleWrap{width:230px;height:230px;display:flex;align-items:center;justify-content:center;position:relative}
+.bRing{position:absolute;inset:0;border-radius:50%;border:2px solid #2b5f8a;opacity:.4}
+#bCircle{
+  width:130px;height:130px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#7ec8e8,#3f8cae 60%,#255373);
+  box-shadow:0 0 60px rgba(90,180,220,.45);
+  transition:transform 4s cubic-bezier(.45,0,.55,1)
+}
+#bPhase{font-size:1.5rem;font-weight:600;letter-spacing:1px}
+#bCycle{color:var(--dim);font-size:.9rem}
+#bReason{max-width:480px;color:var(--amber);font-style:italic;font-size:.95rem;line-height:1.5}
+
+/* ---------- SESSION ---------- */
+.sesGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:12px 0}
+.sesGrid button{
+  background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:14px;
+  padding:16px 6px;font-size:1.05rem;cursor:pointer;font-family:inherit;transition:.2s
+}
+.sesGrid button:hover{border-color:var(--leaf);color:var(--leaf)}
+#sesRun{text-align:center;display:none;padding:10px 0}
+#sesClock{font-size:3.4rem;font-weight:700;letter-spacing:2px;color:var(--amber);font-variant-numeric:tabular-nums}
+#sesRun .bar{max-width:420px;margin:16px auto}
+#sesRun .bar i{background:linear-gradient(90deg,#c98a3f,var(--amber))}
+
+/* ---------- STATS ---------- */
+.statCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.sc{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.sc b{display:block;font-size:1.5rem;color:var(--leaf)}
+.sc span{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#chart{width:100%;height:auto;display:block}
+.achGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.ach{
+  display:flex;gap:12px;align-items:center;background:var(--card2);border:1px solid var(--line);
+  border-radius:14px;padding:12px;opacity:.45;filter:grayscale(.8)
+}
+.ach.won{opacity:1;filter:none;border-color:#8a6b3b;background:#241f12}
+.ach .ico{font-size:1.7rem}
+.ach .n{font-weight:600;font-size:.9rem}
+.ach .d{font-size:.75rem;color:var(--dim);margin-top:2px}
+
+/* ---------- MODAL / TOAST / LEAVES ---------- */
+.modal{position:fixed;inset:0;background:rgba(4,14,20,.9);z-index:50;display:none;align-items:center;justify-content:center;padding:18px}
+.modal.on{display:flex}
+.mbox{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;max-width:480px;width:100%;max-height:92vh;overflow-y:auto}
+.mbox h2{margin-bottom:6px}
+.mbox .sub{color:var(--dim);font-size:.85rem;line-height:1.5;margin-bottom:8px}
+#toasts{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  background:#12352a;border:1px solid #2a7a55;color:#d8ffe9;padding:11px 20px;border-radius:14px;
+  font-size:.92rem;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:tin .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap
+}
+.toast.gold{background:#2c2412;border-color:#8a6b3b;color:#ffe9b8}
+@keyframes tin{from{opacity:0;transform:translateY(20px) scale(.9)}to{opacity:1;transform:none}}
+.leaf{position:fixed;top:-40px;z-index:65;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{
+  0%{transform:translateY(0) rotate(0) translateX(0)}
+  25%{transform:translateY(28vh) rotate(90deg) translateX(30px)}
+  50%{transform:translateY(55vh) rotate(200deg) translateX(-25px)}
+  100%{transform:translateY(108vh) rotate(340deg) translateX(15px);opacity:.4}
+}
+footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>🌱 Detoks Bahçesi</h1>
+      <p>Ekranlardan uzaklaştıkça zihnin yeşerir</p>
+    </div>
+    <div class="hstats">
+      <div class="chip fire"><b id="hStreak">0</b><span>Gün Seri</span></div>
+      <div class="chip"><b id="hTrees">0</b><span>Ağaç</span></div>
+      <div class="lvlbox">
+        <div class="t"><b id="hLvl">Seviye 1</b><span id="hXp">0 XP</span></div>
+        <div class="bar"><i id="hLvlBar" style="width:0%"></i></div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <button data-tab="bahce" class="on">🌳 Bahçem</button>
+    <button data-tab="bugun">☀️ Bugün</button>
+    <button data-tab="durtu">🌊 Dürtü Anı</button>
+    <button data-tab="seans">🕯️ Detoks Seansı</button>
+    <button data-tab="stats">📊 İstatistik</button>
+    <button data-tab="ayar">⚙️ Ayarlar</button>
+  </nav>
+
+  <!-- ============ BAHÇE ============ -->
+  <section id="tab-bahce" class="on">
+    <div class="gardenBox">
+      <svg id="gardenSvg" viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#081522"/><stop offset=".6" stop-color="#123441"/><stop offset="1" stop-color="#1a4a48"/>
+          </linearGradient>
+          <radialGradient id="moonG"><stop offset="0" stop-color="#f5e9c9" stop-opacity=".5"/><stop offset="1" stop-color="#f5e9c9" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect width="1000" height="460" fill="url(#skyG)"/>
+        <g id="gStars"></g>
+        <circle cx="830" cy="82" r="72" fill="url(#moonG)"/>
+        <circle cx="830" cy="82" r="32" fill="#f5e9c9"/>
+        <circle cx="820" cy="74" r="6" fill="#e8d9b0" opacity=".7"/>
+        <circle cx="842" cy="92" r="4" fill="#e8d9b0" opacity=".6"/>
+        <g id="gFlies"></g>
+        <path d="M0,318 Q220,258 470,305 T1000,295 L1000,460 0,460 Z" fill="#1b4436"/>
+        <path d="M0,362 Q300,302 640,352 T1000,340 L1000,460 0,460 Z" fill="#16382d"/>
+        <path d="M0,412 Q380,366 1000,398 L1000,460 0,460 Z" fill="#102a22"/>
+        <g id="gPlants"></g>
+      </svg>
+    </div>
+    <div class="quote" id="quoteBox"></div>
+    <div class="quickrow">
+      <button class="btn wave" onclick="startBreath()">🌊 Dürtü Geldi!</button>
+      <button class="btn" onclick="goTab('bugun')">☀️ Bugünü Kaydet</button>
+      <button class="btn ghost" onclick="goTab('seans')">🕯️ Seans Başlat</button>
+    </div>
+  </section>
+
+  <!-- ============ BUGÜN ============ -->
+  <section id="tab-bugun">
+    <div class="grid2">
+      <div class="card">
+        <h2>🎯 Bugünkü Hedefin</h2>
+        <div class="targetBig">
+          <div class="v" id="tTarget">–</div>
+          <div class="l" id="tWeekInfo"></div>
+        </div>
+        <p class="muted">Telefonunun <b>Dijital Denge / Ekran Süresi</b> ekranına bak ve bugünkü toplam süreyi gir. Dürüst ol — bahçe sadece gerçeğe büyür. 🌱</p>
+        <label class="f">Bugünkü toplam ekran sürem</label>
+        <div class="timerow">
+          <input type="number" id="inH" min="0" max="24" value="0"><span>saat</span>
+          <input type="number" id="inM" min="0" max="59" value="0"><span>dakika</span>
+        </div>
+        <div style="margin-top:14px"><button class="btn" onclick="saveScreen()">Kaydet</button></div>
+        <div class="statusMsg" id="statusMsg"></div>
+      </div>
+      <div class="card">
+        <h2>✅ Günün Görevleri <span class="muted" style="margin-left:auto;font-weight:400" id="chCount"></span></h2>
+        <div id="chList"></div>
+        <p class="muted" style="margin-top:8px">Her görev +10 XP. Bunlar bağımlılığın en çok beslendiği anları hedefler.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🌤️ Bugün Neler Oldu</h2>
+      <div class="statCards">
+        <div class="sc"><b id="dUrge">0</b><span>Yenilen Dürtü</span></div>
+        <div class="sc"><b id="dDetox">0 dk</b><span>Detoks Seansı</span></div>
+        <div class="sc"><b id="dScreen">–</b><span>Ekran Süresi</span></div>
+        <div class="sc"><b id="dLeft">–</b><span>Kalan Hak</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DÜRTÜ ============ -->
+  <section id="tab-durtu">
+    <div class="card">
+      <h2>🌊 Dürtü Sörfü</h2>
+      <p class="muted">Telefona uzanma isteği bir dalga gibidir: yükselir, tepe yapar ve <b>sen hiçbir şey yapmasan da 90 saniye içinde söner</b>. Dürtü geldiğinde ona kapılmak yerine üzerinde sörf yap: aşağıdaki nefes egzersizini başlat ve dalganın geçişini izle.</p>
+      <div class="urgeCenter">
+        <button class="btn wave big" onclick="startBreath()">🌊 Dürtü Geldi — Nefes Al</button>
+        <p class="muted" style="margin-top:10px">6 döngü × (4 sn al · 4 sn tut · 6 sn ver) ≈ 84 saniye · +15 XP</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>💡 Dalga geçince şunu dene</h2>
+        <ul class="tips">
+          <li><b>Bir bardak su iç</b> — eline telefon yerine bardak al</li>
+          <li><b>Pencereden 2 dakika dışarı bak</b> — gözlerin de detoks yapsın</li>
+          <li><b>10 derin squat / şınav</b> — dopamini hareketle al</li>
+          <li><b>Yanındaki bir eşyayı düzelt</b> — eline küçük bir görev ver</li>
+          <li><b>Aklındakini kâğıda yaz</b> — "sonra bakarım" listesi tut</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>📖 Neden bırakıyorum?</h2>
+        <p class="muted">Kendi cümlelerin, en zayıf anında sana en güçlü hatırlatmadır. Dürtü egzersizi sırasında ekranda görünecek.</p>
+        <textarea id="reasonBox" placeholder="Örn: Vaktimi kaydırarak değil, yaşayarak geçirmek istiyorum..."></textarea>
+        <div style="margin-top:10px"><button class="btn ghost" onclick="saveReason()">Kaydet</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SEANS ============ -->
+  <section id="tab-seans">
+    <div class="card">
+      <h2>🕯️ Detoks Seansı</h2>
+      <p class="muted">Telefonu <b>başka bir odaya</b> koy, bu sayfayı açık bırak ve süren dolana kadar ekranlardan uzak dur. Sayfayı kapatsan bile sayaç çalışmaya devam eder. Her tamamlanan seans bahçene bir çiçek ekler. 🌼</p>
+      <div id="sesPick">
+        <div class="sesGrid">
+          <button onclick="startSession(15)">15 dk</button>
+          <button onclick="startSession(30)">30 dk</button>
+          <button onclick="startSession(45)">45 dk</button>
+          <button onclick="startSession(60)">1 saat</button>
+          <button onclick="startSession(90)">1,5 saat</button>
+          <button onclick="startSession(120)">2 saat</button>
+        </div>
+      </div>
+      <div id="sesRun">
+        <p class="muted" id="sesLabel"></p>
+        <div id="sesClock">00:00</div>
+        <div class="bar"><i id="sesBar" style="width:0%"></i></div>
+        <p class="muted" style="margin:10px 0 14px">Telefon başka odada. Sen buradasın. Bu yeterli. 🍃</p>
+        <button class="btn danger" id="sesCancelBtn" onclick="cancelSession(this)">Vazgeç</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ İSTATİSTİK ============ -->
+  <section id="tab-stats">
+    <div class="statCards">
+      <div class="sc"><b id="sStreak">0</b><span>Gün Seri</span></div>
+      <div class="sc"><b id="sSuccess">0</b><span>Başarılı Gün</span></div>
+      <div class="sc"><b id="sUrges">0</b><span>Yenilen Dürtü</span></div>
+      <div class="sc"><b id="sDetox">0</b><span>Detoks Dakikası</span></div>
+    </div>
+    <div class="card">
+      <h2>📊 Son 14 Gün — Ekran Süresi</h2>
+      <svg id="chart" viewBox="0 0 700 230" xmlns="http://www.w3.org/2000/svg"></svg>
+      <p class="muted" style="margin-top:6px">🟩 hedefin altında · 🟧 hedefin üstünde · beyaz çizgi = o günün hedefi</p>
+    </div>
+    <div class="card">
+      <h2>🏆 Başarımlar <span class="muted" style="margin-left:auto;font-weight:400" id="achCount"></span></h2>
+      <div class="achGrid" id="achGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ AYARLAR ============ -->
+  <section id="tab-ayar">
+    <div class="card">
+      <h2>⚙️ Azaltma Planı</h2>
+      <p class="muted">Hedef, başlangıç süresinden bitiş hedefine haftalar içinde kademeli iner. Aniden sıfırlamak değil, sürdürülebilir azaltmak esastır.</p>
+      <div class="grid2">
+        <div>
+          <label class="f">Şu anki günlük ortalama (saat)</label>
+          <input type="number" id="setBase" min="1" max="18" step="0.5">
+        </div>
+        <div>
+          <label class="f">Hedefim (saat)</label>
+          <input type="number" id="setGoal" min="0.5" max="12" step="0.5">
+        </div>
+      </div>
+      <label class="f">Kaç haftada inelim?</label>
+      <select id="setWeeks">
+        <option value="4">4 hafta — hızlı</option>
+        <option value="8">8 hafta — dengeli (önerilen)</option>
+        <option value="12">12 hafta — yumuşak</option>
+        <option value="16">16 hafta — çok yumuşak</option>
+      </select>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="savePlan(false)">Planı Güncelle</button>
+        <button class="btn ghost" onclick="savePlan(true)">Planı Bugünden Yeniden Başlat</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🔊 Ses & Veri</h2>
+      <div class="chItem" id="soundToggle" onclick="toggleSound()">
+        <div class="box" id="soundBox"></div><div class="tx">Ses efektleri açık</div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="btn danger" id="wipeBtn" onclick="wipeData(this)">Tüm Verileri Sil</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>🌿 Detoks Bahçesi — bahçen yalnızca senin cihazında yaşar (localStorage)</footer>
+</div>
+
+<!-- ============ NEFES OVERLAY ============ -->
+<div id="breathOverlay">
+  <div id="bReason"></div>
+  <div class="bCircleWrap"><div class="bRing"></div><div id="bCircle"></div></div>
+  <div id="bPhase">Hazır ol...</div>
+  <div id="bCycle"></div>
+  <button class="btn ghost" onclick="stopBreath(false)">Bırak</button>
+</div>
+
+<!-- ============ ONBOARDING ============ -->
+<div class="modal" id="obModal">
+  <div class="mbox">
+    <h2>🌱 Bahçene hoş geldin</h2>
+    <p class="sub">Teknoloji bağımlılığından kurtulmanın yolu iradeyi zorlamak değil, <b>sistemi kurmaktır</b>. Önce dürüst bir başlangıç noktası belirleyelim — telefonunun ekran süresi istatistiğine bakabilirsin.</p>
+    <label class="f">Şu an günde ortalama kaç saat ekrandayım?</label>
+    <input type="number" id="obBase" min="1" max="18" step="0.5" value="7">
+    <label class="f">Hedefim: günde kaç saate inmek istiyorum?</label>
+    <input type="number" id="obGoal" min="0.5" max="12" step="0.5" value="3">
+    <label class="f">Kaç haftada inelim?</label>
+    <select id="obWeeks">
+      <option value="4">4 hafta — hızlı</option>
+      <option value="8" selected>8 hafta — dengeli (önerilen)</option>
+      <option value="12">12 hafta — yumuşak</option>
+    </select>
+    <label class="f">Neden bırakmak istiyorum? (isteğe bağlı ama güçlü)</label>
+    <textarea id="obReason" placeholder="Örn: Akşamları kendimi boş hissediyorum. Zamanım kayıp gidiyor..."></textarea>
+    <div style="margin-top:16px"><button class="btn big" style="width:100%" onclick="finishOnboarding()">🌳 Bahçemi Kur</button></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* =================== VERİ =================== */
+const LS='detoks-bahcesi-v1';
+let D=null;
+function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null}}
+function save(){localStorage.setItem(LS,JSON.stringify(D))}
+function dkey(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+function day(k=dkey()){if(!D.days[k])D.days[k]={screen:null,ch:[],urges:0,detox:0,success:false};return D.days[k]}
+function daysSince(k){return Math.round((new Date(dkey()+'T00:00')-new Date(k+'T00:00'))/86400000)}
+function fmtMin(m){if(m==null)return'–';const h=Math.floor(m/60),mm=m%60;if(h&&mm)return h+' sa '+mm+' dk';if(h)return h+' saat';return mm+' dk'}
+
+/* =================== PLAN / HEDEF =================== */
+function targetFor(k){
+  const p=D.plan;
+  const week=Math.max(0,Math.floor((new Date(k+'T00:00')-new Date(p.start+'T00:00'))/604800000));
+  const frac=Math.min((week+1)/p.weeks,1);
+  const t=p.baseline+(p.goal-p.baseline)*frac;
+  return Math.max(p.goal,Math.round(t/5)*5);
+}
+function weekNo(){return Math.min(D.plan.weeks,Math.floor(Math.max(0,daysSince(D.plan.start))/7)+1)}
+
+/* =================== XP / SEVİYE =================== */
+function level(){let lv=1,x=D.xp,need=100;while(x>=need){x-=need;lv++;need=100+(lv-1)*25}return{lv,cur:x,need}}
+function addXP(n,msg){D.xp+=n;if(msg)toast(msg+' · +'+n+' XP');save();renderHeader();checkAch()}
+
+/* =================== SERİ / SAYIMLAR =================== */
+function streak(){
+  let s=0,d=new Date();
+  if(!(D.days[dkey(d)]||{}).success)d.setDate(d.getDate()-1);
+  while((D.days[dkey(d)]||{}).success){s++;d.setDate(d.getDate()-1)}
+  return s;
+}
+function successCount(){return Object.values(D.days).filter(x=>x.success).length}
+
+/* =================== SESLER =================== */
+let AC=null;
+function beep(freqs,dur=0.28,gap=0.09,type='sine',vol=0.16){
+  if(!D||!D.sound)return;
+  try{
+    AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{
+      const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;
+      const t=AC.currentTime+i*gap;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.03);
+      g.gain.exponentialRampToValueAtTime(0.001,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+0.05);
+    });
+  }catch(e){}
+}
+const sndOk=()=>beep([523,659,784]),sndGold=()=>beep([523,659,784,1047],0.4,0.12),sndSoft=()=>beep([440],0.15,0,'sine',0.08),sndWave=()=>beep([330,392],0.5,0.25);
+
+/* =================== TOAST / YAPRAK =================== */
+function toast(msg,gold){
+  const t=document.createElement('div');t.className='toast'+(gold?' gold':'');t.textContent=msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity .5s';t.style.opacity=0;setTimeout(()=>t.remove(),500)},3200);
+}
+function leaves(){
+  const em=['🍃','🌿','🍂','✨'];
+  for(let i=0;i<26;i++){
+    const l=document.createElement('div');l.className='leaf';l.textContent=em[Math.floor(Math.random()*em.length)];
+    l.style.left=Math.random()*100+'vw';l.style.fontSize=(14+Math.random()*18)+'px';
+    l.style.animationDuration=(2.6+Math.random()*2.5)+'s';l.style.animationDelay=(Math.random()*0.9)+'s';
+    document.body.appendChild(l);setTimeout(()=>l.remove(),6200);
+  }
+}
+
+/* =================== BAŞARIMLAR =================== */
+const ACH=[
+ {id:'a1', ico:'👣', n:'İlk Adım',          d:'İlk ekran süresi kaydını gir',        c:()=>Object.values(D.days).some(x=>x.screen!=null)},
+ {id:'a2', ico:'🌱', n:'İlk Tohum',         d:'Hedefin altında bir gün geçir',       c:()=>successCount()>=1},
+ {id:'a3', ico:'🌿', n:'Üç Fidan',          d:'3 günlük seri yakala',                c:()=>streak()>=3},
+ {id:'a4', ico:'🌳', n:'Bir Hafta Özgür',   d:'7 günlük seri yakala',                c:()=>streak()>=7},
+ {id:'a5', ico:'🦋', n:'Alışkanlık Kırıcı', d:'21 günlük seri yakala',               c:()=>streak()>=21},
+ {id:'a6', ico:'🌲', n:'Orman',             d:'Toplam 30 başarılı gün',              c:()=>successCount()>=30},
+ {id:'a7', ico:'🌊', n:'Dalga Sörfçüsü',    d:'10 dürtü yen',                        c:()=>D.totals.urges>=10},
+ {id:'a8', ico:'🧘', n:'Fırtına Dindi',     d:'50 dürtü yen',                        c:()=>D.totals.urges>=50},
+ {id:'a9', ico:'🕯️', n:'İlk Sessizlik',    d:'İlk detoks seansını tamamla',         c:()=>D.totals.detox>0},
+ {id:'a10',ico:'🏔️', n:'Derin Sessizlik',  d:'Toplam 500 dk detoks yap',            c:()=>D.totals.detox>=500},
+ {id:'a11',ico:'✅', n:'Tam Gün',           d:'Bir günde 5 görevin hepsini yap',     c:()=>Object.values(D.days).some(x=>(x.ch||[]).length>=5)},
+ {id:'a12',ico:'🌟', n:'Bilge Bahçıvan',    d:'Seviye 10\'a ulaş',                   c:()=>level().lv>=10},
+];
+function checkAch(){
+  ACH.forEach(a=>{
+    if(!D.ach.includes(a.id)&&a.c()){
+      D.ach.push(a.id);save();sndGold();
+      toast(a.ico+' Başarım: '+a.n+'!',true);
+    }
+  });
+  renderAch();
+}
+
+/* =================== GÖREVLER =================== */
+const CH=[
+ {id:'c1',ico:'🌅',tx:'Uyandıktan sonra 1 saat telefona dokunmadım'},
+ {id:'c2',ico:'🍽️',tx:'Yemeklerde ekran yoktu'},
+ {id:'c3',ico:'🌙',tx:'Yatmadan 1 saat önce ekranları bıraktım'},
+ {id:'c4',ico:'🔕',tx:'Gereksiz bildirimler kapalıydı'},
+ {id:'c5',ico:'🚶',tx:'Telefonsuz en az 20 dk yürüyüş/mola yaptım'},
+];
+function toggleCh(id){
+  const d=day();const i=d.ch.indexOf(id);
+  if(i>=0){d.ch.splice(i,1);save()}
+  else{d.ch.push(id);sndSoft();addXP(10,'Görev tamam')}
+  renderToday();
+}
+function renderToday(){
+  const d=day(),t=targetFor(dkey());
+  document.getElementById('tTarget').textContent=fmtMin(t);
+  document.getElementById('tWeekInfo').textContent=weekNo()+'. hafta · '+D.plan.weeks+' haftalık planın içindesin';
+  document.getElementById('chList').innerHTML=CH.map(c=>{
+    const on=d.ch.includes(c.id);
+    return '<div class="chItem'+(on?' done':'')+'" onclick="toggleCh(\''+c.id+'\')"><div class="box">'+(on?'✔':'')+'</div><div class="tx">'+c.ico+' '+c.tx+'</div></div>';
+  }).join('');
+  document.getElementById('chCount').textContent=d.ch.length+'/5';
+  document.getElementById('dUrge').textContent=d.urges;
+  document.getElementById('dDetox').textContent=d.detox+' dk';
+  document.getElementById('dScreen').textContent=fmtMin(d.screen);
+  const left=d.screen==null?t:t-d.screen;
+  const lEl=document.getElementById('dLeft');
+  lEl.textContent=(left>=0?fmtMin(left):'-'+fmtMin(-left));lEl.style.color=left>=0?'':'var(--bad)';
+  if(d.screen!=null){
+    const h=Math.floor(d.screen/60);document.getElementById('inH').value=h;document.getElementById('inM').value=d.screen-h*60;
+    const s=document.getElementById('statusMsg');
+    if(d.success){s.className='statusMsg ok';s.innerHTML='🌱 Harika! Bugün hedefin <b>'+fmtMin(t-d.screen)+'</b> altındasın. Bahçene bir ağaç dikildi.'}
+    else{s.className='statusMsg over';s.innerHTML='🍂 Bugün hedefi <b>'+fmtMin(d.screen-t)+'</b> aştın. Sorun değil — yarın dalga senin. Kaydettiğin için +XP aldın; dürüstlük ilerlemenin yarısıdır.'}
+  }
+}
+
+/* =================== EKRAN SÜRESİ KAYDI =================== */
+function saveScreen(){
+  const h=parseInt(document.getElementById('inH').value)||0;
+  const m=parseInt(document.getElementById('inM').value)||0;
+  const total=h*60+m;
+  if(total<0||total>1440){toast('Geçerli bir süre gir 🙂');return}
+  const k=dkey(),d=day(k),first=d.screen==null,wasSuccess=d.success,t=targetFor(k);
+  d.screen=total;d.success=total<=t;
+  if(first)addXP(10,'Gün kaydedildi');
+  if(d.success&&!wasSuccess){plantTree(k);addXP(30,'Hedefin altında gün');leaves();sndOk()}
+  if(!d.success&&wasSuccess){unplantTree(k)}
+  save();renderAll();
+}
+
+/* =================== BAHÇE =================== */
+const TREECOLS=[['#3fae7a','#2a7a55'],['#5cbf8a','#357a52'],['#7ed491','#3f9e66'],['#8fae3f','#5c7a2a']];
+function plantTree(k){
+  if(D.garden.some(g=>g.t==='tree'&&g.day===k))return;
+  D.garden.push({t:'tree',day:k,v:Math.floor(Math.random()*3),c:Math.floor(Math.random()*TREECOLS.length),
+    x:40+Math.random()*920,y:300+Math.random()*128});
+  D._new=k;save();
+}
+function unplantTree(k){D.garden=D.garden.filter(g=>!(g.t==='tree'&&g.day===k));save()}
+function plantFlower(){
+  D.garden.push({t:'flower',ts:Date.now(),v:Math.floor(Math.random()*3),
+    x:60+Math.random()*880,y:330+Math.random()*110});
+  D._new='f'+Date.now();save();
+}
+function treeSVG(g){
+  const s=0.55+((g.y-300)/128)*0.65,[c1,c2]=TREECOLS[g.c||0];let inner='';
+  if(g.v===0){ /* çam */
+    inner='<rect x="-4" y="-14" width="8" height="16" rx="2" fill="#5c4433"/>'+
+      '<polygon points="0,-86 26,-38 -26,-38" fill="'+c2+'"/>'+
+      '<polygon points="0,-70 30,-22 -30,-22" fill="'+c1+'"/>'+
+      '<polygon points="0,-52 34,-6 -34,-6" fill="'+c2+'"/>';
+  }else if(g.v===1){ /* yuvarlak */
+    inner='<rect x="-5" y="-30" width="10" height="32" rx="3" fill="#5c4433"/>'+
+      '<circle cx="-16" cy="-42" r="20" fill="'+c2+'"/>'+
+      '<circle cx="16" cy="-44" r="19" fill="'+c2+'"/>'+
+      '<circle cx="0" cy="-58" r="24" fill="'+c1+'"/>';
+  }else{ /* selvi */
+    inner='<rect x="-4" y="-10" width="8" height="12" rx="2" fill="#5c4433"/>'+
+      '<ellipse cx="0" cy="-52" rx="15" ry="46" fill="'+c1+'"/>'+
+      '<ellipse cx="0" cy="-60" rx="9" ry="34" fill="'+c2+'" opacity=".55"/>';
+  }
+  return {inner,s};
+}
+const FLOWCOLS=['#e8a1c4','#ffd28a','#9fc8ff'];
+function flowerSVG(g){
+  const s=0.6+((g.y-300)/128)*0.5,c=FLOWCOLS[g.v||0];
+  const inner='<rect x="-1.5" y="-18" width="3" height="18" fill="#4a7a4a"/>'+
+    '<circle cx="0" cy="-22" r="4" fill="'+c+'"/><circle cx="-6" cy="-19" r="4" fill="'+c+'"/>'+
+    '<circle cx="6" cy="-19" r="4" fill="'+c+'"/><circle cx="-3.5" cy="-26" r="4" fill="'+c+'"/>'+
+    '<circle cx="3.5" cy="-26" r="4" fill="'+c+'"/><circle cx="0" cy="-21.5" r="3" fill="#fff3c4"/>';
+  return {inner,s};
+}
+function renderGarden(){
+  const g=document.getElementById('gPlants');
+  const items=[...D.garden].sort((a,b)=>a.y-b.y);
+  g.innerHTML=items.map(it=>{
+    const {inner,s}=it.t==='tree'?treeSVG(it):flowerSVG(it);
+    const id=it.t==='tree'?it.day:'f'+it.ts;
+    const isNew=D._new===id;
+    return '<g transform="translate('+it.x.toFixed(1)+','+it.y.toFixed(1)+') scale('+s.toFixed(2)+')">'+
+      '<g'+(isNew?' class="plant-new"':'')+'>'+inner+'</g></g>';
+  }).join('');
+  D._new=null;
+  /* ateş böcekleri: yenilen her dürtü gökyüzüne bir ışık ekler */
+  const n=Math.min(D.totals.urges,40),f=document.getElementById('gFlies');
+  let fh='';
+  for(let i=0;i<n;i++){
+    const r=Math.abs(Math.sin(i*127.1))%1,r2=Math.abs(Math.sin(i*311.7))%1;
+    fh+='<circle class="fly" cx="'+(30+r*940).toFixed(0)+'" cy="'+(40+r2*200).toFixed(0)+'" r="2.2" fill="#ffe9a3" style="animation-delay:'+(r*6).toFixed(1)+'s"/>';
+  }
+  f.innerHTML=fh;
+}
+function renderStars(){
+  const g=document.getElementById('gStars');let h='';
+  for(let i=0;i<70;i++){
+    const r=Math.abs(Math.sin(i*91.3))%1,r2=Math.abs(Math.sin(i*57.9))%1,r3=Math.abs(Math.sin(i*13.7))%1;
+    h+='<circle class="star" cx="'+(r*1000).toFixed(0)+'" cy="'+(r2*230).toFixed(0)+'" r="'+(0.6+r3*1.3).toFixed(1)+'" fill="#dfe9f5" style="animation-delay:'+(r3*4).toFixed(1)+'s;animation-duration:'+(2.2+r*3).toFixed(1)+'s"/>';
+  }
+  g.innerHTML=h;
+}
+
+/* =================== ALINTILAR =================== */
+const QUOTES=[
+ '"Dikkatin nereye akarsa, hayatın oraya akar."',
+ '"Telefonu elinden bırakmak bir kayıp değil, bir kavuşmadır: kendine."',
+ '"Sıkılmak, beynin nefes almasıdır. Ona izin ver."',
+ '"Her bildirimi kapatış, kendi sesini bir tık daha açıştır."',
+ '"Ağaç, sabırla büyür. Sen de öyle."',
+ '"Gerçek akış, akışta kaydırdığın değil; içinde kaybolduğun iştir."',
+ '"Bugün kazandığın 1 saat, yılda 15 gündür."',
+ '"Dalga gelir, tepe yapar, söner. Sen kaldın, o gitti."',
+];
+let qIdx=0;
+function rotateQuote(){
+  const q=document.getElementById('quoteBox');
+  q.style.opacity=0;
+  setTimeout(()=>{q.textContent=QUOTES[qIdx%QUOTES.length];q.style.opacity=1;qIdx++},800);
+}
+
+/* =================== NEFES / DÜRTÜ =================== */
+let bTimer=null,bAlive=false;
+const PHASES=[['Nefes al 🌬️',4,1.4],['Tut ✋',4,1.4],['Ver 🍃',6,1]];
+function startBreath(){
+  document.getElementById('bReason').textContent=D.reason?'Hatırla: '+D.reason:'';
+  document.getElementById('breathOverlay').classList.add('on');
+  bAlive=true;sndWave();
+  runCycle(0,0);
+}
+function runCycle(cy,ph){
+  if(!bAlive)return;
+  if(cy>=6){finishBreath();return}
+  const [label,sec,scale]=PHASES[ph];
+  document.getElementById('bPhase').textContent=label;
+  document.getElementById('bCycle').textContent='Döngü '+(cy+1)+' / 6';
+  const c=document.getElementById('bCircle');
+  c.style.transitionDuration=sec+'s';c.style.transform='scale('+scale+')';
+  bTimer=setTimeout(()=>{const np=ph+1;if(np>=PHASES.length)runCycle(cy+1,0);else runCycle(cy,np)},sec*1000);
+}
+function finishBreath(){
+  bAlive=false;clearTimeout(bTimer);
+  day().urges++;D.totals.urges++;save();
+  document.getElementById('bPhase').textContent='Dalga geçti 🌊';
+  const tips=['Şimdi bir bardak su iç 💧','Şimdi pencereden dışarı bak 🌤️','Şimdi 10 squat yap 💪','Şimdi aklındakini kâğıda yaz ✍️'];
+  document.getElementById('bCycle').textContent=tips[Math.floor(Math.random()*tips.length)];
+  sndOk();addXP(15,'Dürtü yenildi 🌊');
+  setTimeout(()=>stopBreath(true),2400);
+}
+function stopBreath(done){
+  bAlive=false;clearTimeout(bTimer);
+  document.getElementById('breathOverlay').classList.remove('on');
+  document.getElementById('bCircle').style.transform='scale(1)';
+  document.getElementById('bPhase').textContent='Hazır ol...';
+  if(!done)toast('Sorun değil. Dürtü fark etmek bile bir adımdır 🍃');
+  renderAll();
+}
+function saveReason(){
+  D.reason=document.getElementById('reasonBox').value.trim();save();
+  toast('Kaydedildi. En zor anında bu cümle yanında 📖');
+}
+
+/* =================== DETOKS SEANSI =================== */
+let sesInt=null;
+function startSession(min){
+  D.session={start:Date.now(),dur:min};save();
+  sndSoft();renderSession();
+  toast('Seans başladı. Telefonu başka odaya bırak 🕯️');
+}
+function cancelSession(btn){
+  if(btn.dataset.arm!=='1'){btn.dataset.arm='1';btn.textContent='Emin misin? Evet, vazgeç';setTimeout(()=>{btn.dataset.arm='';btn.textContent='Vazgeç'},2600);return}
+  D.session=null;save();clearInterval(sesInt);
+  toast('Seans iptal edildi. Hazır olduğunda yeniden dene 🍂');
+  renderSession();
+}
+function completeSession(){
+  const min=D.session.dur;
+  D.session=null;day().detox+=min;D.totals.detox+=min;
+  plantFlower();save();clearInterval(sesInt);
+  leaves();sndGold();
+  addXP(Math.max(10,Math.round(min/3)),min+' dk detoks tamam 🕯️');
+  toast('🌼 Bahçene bir çiçek eklendi!',true);
+  renderAll();
+}
+function renderSession(){
+  clearInterval(sesInt);
+  const pick=document.getElementById('sesPick'),run=document.getElementById('sesRun');
+  if(!D.session){pick.style.display='block';run.style.display='none';return}
+  const el=(Date.now()-D.session.start)/60000;
+  if(el>=D.session.dur){completeSession();return}
+  pick.style.display='none';run.style.display='block';
+  document.getElementById('sesLabel').textContent=D.session.dur+' dakikalık seans sürüyor';
+  const tick=()=>{
+    if(!D.session)return;
+    const elapsed=(Date.now()-D.session.start)/1000,total=D.session.dur*60,rem=Math.max(0,total-elapsed);
+    const mm=String(Math.floor(rem/60)).padStart(2,'0'),ss=String(Math.floor(rem%60)).padStart(2,'0');
+    document.getElementById('sesClock').textContent=mm+':'+ss;
+    document.getElementById('sesBar').style.width=Math.min(100,elapsed/total*100)+'%';
+    if(rem<=0)completeSession();
+  };
+  tick();sesInt=setInterval(tick,1000);
+}
+
+/* =================== GRAFİK =================== */
+function renderChart(){
+  const svg=document.getElementById('chart');
+  const days=[];const now=new Date();
+  for(let i=13;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(dkey(d))}
+  const vals=days.map(k=>(D.days[k]||{}).screen),tgts=days.map(k=>targetFor(k));
+  const maxV=Math.max(...tgts,...vals.filter(v=>v!=null),60)*1.18;
+  const W=700,H=230,pad=8,bw=W/14;
+  let h='';
+  days.forEach((k,i)=>{
+    const x=i*bw+pad,w=bw-pad*2,v=vals[i],t=tgts[i];
+    const ty=H-24-(t/maxV)*(H-40);
+    if(v!=null){
+      const bh=(v/maxV)*(H-40),y=H-24-bh;
+      const col=v<=t?'#7ed491':'#e8a15f';
+      h+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+bh+'" rx="5" fill="'+col+'" opacity=".9"><title>'+k+' · '+fmtMin(v)+' (hedef '+fmtMin(t)+')</title></rect>';
+    }else{
+      h+='<rect x="'+x+'" y="'+(H-28)+'" width="'+w+'" height="4" rx="2" fill="#38505a"/>';
+    }
+    h+='<line x1="'+x+'" y1="'+ty+'" x2="'+(x+w)+'" y2="'+ty+'" stroke="#dcefe6" stroke-width="1.6" stroke-dasharray="4 3" opacity=".75"/>';
+    const lbl=k.slice(8,10);
+    h+='<text x="'+(x+w/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="#8fb3a8">'+lbl+'</text>';
+  });
+  svg.innerHTML=h;
+}
+
+/* =================== RENDER =================== */
+function renderHeader(){
+  const l=level();
+  document.getElementById('hStreak').textContent=streak();
+  document.getElementById('hTrees').textContent=D.garden.filter(g=>g.t==='tree').length;
+  document.getElementById('hLvl').textContent='Seviye '+l.lv;
+  document.getElementById('hXp').textContent=D.xp+' XP';
+  document.getElementById('hLvlBar').style.width=(l.cur/l.need*100).toFixed(0)+'%';
+}
+function renderAch(){
+  const won=D.ach.length;
+  document.getElementById('achCount').textContent=won+'/'+ACH.length;
+  document.getElementById('achGrid').innerHTML=ACH.map(a=>
+    '<div class="ach'+(D.ach.includes(a.id)?' won':'')+'"><div class="ico">'+a.ico+'</div><div><div class="n">'+a.n+'</div><div class="d">'+a.d+'</div></div></div>'
+  ).join('');
+}
+function renderStats(){
+  document.getElementById('sStreak').textContent=streak();
+  document.getElementById('sSuccess').textContent=successCount();
+  document.getElementById('sUrges').textContent=D.totals.urges;
+  document.getElementById('sDetox').textContent=D.totals.detox;
+  renderChart();
+}
+function renderSettings(){
+  document.getElementById('setBase').value=D.plan.baseline/60;
+  document.getElementById('setGoal').value=D.plan.goal/60;
+  document.getElementById('setWeeks').value=D.plan.weeks;
+  document.getElementById('soundBox').textContent=D.sound?'✔':'';
+  document.getElementById('soundToggle').classList.toggle('done',D.sound);
+  document.getElementById('reasonBox').value=D.reason||'';
+}
+function renderAll(){renderHeader();renderGarden();renderToday();renderStats();renderAch();renderSettings();renderSession()}
+
+/* =================== SEKMELER =================== */
+function goTab(id){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===id));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='tab-'+id));
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
+
+/* =================== AYARLAR =================== */
+function savePlan(restart){
+  const b=Math.round(parseFloat(document.getElementById('setBase').value)*60);
+  const g=Math.round(parseFloat(document.getElementById('setGoal').value)*60);
+  const w=parseInt(document.getElementById('setWeeks').value);
+  if(!b||!g||g>=b){toast('Hedef, başlangıçtan küçük olmalı 🙂');return}
+  D.plan.baseline=b;D.plan.goal=g;D.plan.weeks=w;
+  if(restart)D.plan.start=dkey();
+  save();renderAll();toast(restart?'Plan bugünden yeniden başladı 🌱':'Plan güncellendi ✔');
+}
+function toggleSound(){D.sound=!D.sound;save();renderSettings();if(D.sound)sndSoft()}
+function wipeData(btn){
+  if(btn.dataset.arm!=='1'){btn.dataset.arm='1';btn.textContent='Emin misin? Bahçen tamamen silinecek!';setTimeout(()=>{btn.dataset.arm='';btn.textContent='Tüm Verileri Sil'},3000);return}
+  localStorage.removeItem(LS);location.reload();
+}
+
+/* =================== ONBOARDING =================== */
+function finishOnboarding(){
+  const b=Math.round(parseFloat(document.getElementById('obBase').value)*60);
+  const g=Math.round(parseFloat(document.getElementById('obGoal').value)*60);
+  const w=parseInt(document.getElementById('obWeeks').value);
+  if(!b||!g||g>=b){toast('Hedef, şu anki süreden küçük olmalı 🙂');return}
+  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],
+     totals:{urges:0,detox:0},session:null,sound:true,reason:document.getElementById('obReason').value.trim()};
+  save();
+  document.getElementById('obModal').classList.remove('on');
+  toast('🌱 Bahçen kuruldu. İlk hedefin: günde '+fmtMin(targetFor(dkey())));
+  renderAll();
+}
+
+/* =================== BAŞLAT =================== */
+load();
+renderStars();
+if(!D){document.getElementById('obModal').classList.add('on')}
+else{renderAll()}
+rotateQuote();setInterval(rotateQuote,18000);
+setInterval(()=>{ /* gece yarısı geçişi: görünümü tazele */ renderToday();renderHeader() },60000);
+
+/* PWA: service worker yalnızca güvenli bağlamda kaydolur (https veya localhost);
+   yerel ağ IP'sinden (http://192.168...) erişimde tarayıcı zaten izin vermez */
+if('serviceWorker' in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname))){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
