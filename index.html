@@ -91,7 +91,7 @@ section.on{display:block}
 .btn.wave{background:linear-gradient(135deg,#2b5f8a,#3f8cae)}
 .btn.ghost{background:var(--card2);color:var(--dim);border:1px solid var(--line)}
 .btn.danger{background:linear-gradient(135deg,#8a3b2b,#b0563f)}
-input[type=number],select,textarea{
+input[type=number],input[type=text],select,textarea{
   background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;
   padding:10px 12px;font-size:1rem;font-family:inherit;width:100%
 }
@@ -144,7 +144,7 @@ label.f{display:block;font-size:.78rem;color:var(--dim);margin:10px 0 5px;text-t
 }
 #bPhase{font-size:1.5rem;font-weight:600;letter-spacing:1px}
 #bCycle{color:var(--dim);font-size:.9rem}
-#bReason{max-width:480px;color:var(--amber);font-style:italic;font-size:.95rem;line-height:1.5}
+#bReason{max-width:480px;color:var(--amber);font-style:italic;font-size:.95rem;line-height:1.5;white-space:pre-line}
 
 /* ---------- SESSION ---------- */
 .sesGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:12px 0}
@@ -194,6 +194,29 @@ label.f{display:block;font-size:.78rem;color:var(--dim);margin:10px 0 5px;text-t
   50%{transform:translateY(55vh) rotate(200deg) translateX(-25px)}
   100%{transform:translateY(108vh) rotate(340deg) translateX(15px);opacity:.4}
 }
+/* ---------- BİLGİ KARTLARI ---------- */
+.kart{background:var(--card2);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden}
+.kart .head{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;user-select:none}
+.kart .ico{font-size:1.3rem}
+.kart .t{font-weight:600;font-size:.92rem;flex:1}
+.kart .st{font-size:.72rem;color:var(--dim);white-space:nowrap}
+.kart .body{display:none;padding:0 14px 14px;color:var(--dim);font-size:.9rem;line-height:1.6}
+.kart.open .body{display:block}
+.kart.read .t{color:var(--leaf)}
+.kart.locked{opacity:.45;filter:grayscale(.7)}
+.kart.locked .head{cursor:default}
+/* ---------- KIYAS ---------- */
+.cmpRow{margin-bottom:12px}
+.cmpRow .l{display:flex;justify-content:space-between;font-size:.82rem;color:var(--dim);margin-bottom:4px}
+.cmpRow .l b{color:var(--txt)}
+.cmpBar{height:14px;border-radius:8px;background:#0a1a20;overflow:hidden}
+.cmpBar i{display:block;height:100%;border-radius:8px;transition:width .8s}
+/* ---------- BAYKUŞ / YABANİ OT ---------- */
+#gOwl{cursor:pointer}
+.owlBlink{animation:owlblink 4.6s infinite;transform-box:fill-box;transform-origin:50% 0%}
+@keyframes owlblink{0%,90%,100%{transform:scaleY(.06)}93%,96%{transform:scaleY(1)}}
+.weedSway{animation:sway 3.5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
 footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
 </style>
 </head>
@@ -220,6 +243,7 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
     <button data-tab="bugun">☀️ Bugün</button>
     <button data-tab="durtu">🌊 Dürtü Anı</button>
     <button data-tab="seans">🕯️ Detoks Seansı</button>
+    <button data-tab="bilgi">🧠 Bilgi</button>
     <button data-tab="stats">📊 İstatistik</button>
     <button data-tab="ayar">⚙️ Ayarlar</button>
   </nav>
@@ -245,9 +269,12 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
         <path d="M0,362 Q300,302 640,352 T1000,340 L1000,460 0,460 Z" fill="#16382d"/>
         <path d="M0,412 Q380,366 1000,398 L1000,460 0,460 Z" fill="#102a22"/>
         <g id="gPlants"></g>
+        <g id="gWeeds"></g>
+        <g id="gOwl"></g>
       </svg>
     </div>
     <div class="quote" id="quoteBox"></div>
+    <div class="quote" id="weedNote" style="display:none;color:#b8a45f;font-style:normal">🌾 Bahçende yabani otlar belirdi — hedefin altında bir gün onları temizler.</div>
     <div class="quickrow">
       <button class="btn wave" onclick="startBreath()">🌊 Dürtü Geldi!</button>
       <button class="btn" onclick="goTab('bugun')">☀️ Bugünü Kaydet</button>
@@ -257,6 +284,11 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
 
   <!-- ============ BUGÜN ============ -->
   <section id="tab-bugun">
+    <div class="card">
+      <h2>🌅 Sabah Niyeti</h2>
+      <p class="muted" style="margin-bottom:10px">Güne tepkiyle değil niyetle başla: bugün telefonu <b>ne için</b> kullanacaksın? Niyeti olan, akışa kapılmaz.</p>
+      <div id="intentBox"></div>
+    </div>
     <div class="grid2">
       <div class="card">
         <h2>🎯 Bugünkü Hedefin</h2>
@@ -299,6 +331,7 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
         <button class="btn wave big" onclick="startBreath()">🌊 Dürtü Geldi — Nefes Al</button>
         <p class="muted" style="margin-top:10px">6 döngü × (4 sn al · 4 sn tut · 6 sn ver) ≈ 84 saniye · +15 XP</p>
       </div>
+      <p class="muted" style="border-top:1px dashed var(--line);padding-top:12px">⚡ <b>İpucu:</b> Safari'de <a href="durtu.html" style="color:var(--leaf)">durtu.html</a> sayfasını açıp onu da ana ekrana eklersen, dalga ikonlu ayrı bir <b>"Dürtü!"</b> düğmen olur — dürtü anında uygulamada gezinmeden, tek dokunuşla bu egzersiz başlar.</p>
     </div>
     <div class="grid2">
       <div class="card">
@@ -345,6 +378,15 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
     </div>
   </section>
 
+  <!-- ============ BİLGİ ============ -->
+  <section id="tab-bilgi">
+    <div class="card">
+      <h2>🧠 Beynini Geri Al <span class="muted" style="margin-left:auto;font-weight:400" id="kartProg"></span></h2>
+      <p class="muted">Bağımlılığın mekaniği ve kurtulmanın bilimi: 30 günlük mini seri. Her gün yeni bir kart açılır — düşmanını tanı. Okuduğun her kart +5 XP.</p>
+      <div id="kartList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
   <!-- ============ İSTATİSTİK ============ -->
   <section id="tab-stats">
     <div class="statCards">
@@ -352,6 +394,10 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
       <div class="sc"><b id="sSuccess">0</b><span>Başarılı Gün</span></div>
       <div class="sc"><b id="sUrges">0</b><span>Yenilen Dürtü</span></div>
       <div class="sc"><b id="sDetox">0</b><span>Detoks Dakikası</span></div>
+    </div>
+    <div class="card">
+      <h2>⚖️ Dünya ile Kıyas</h2>
+      <div id="cmpBox"></div>
     </div>
     <div class="card">
       <h2>📊 Son 14 Gün — Ekran Süresi</h2>
@@ -441,7 +487,8 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
 /* =================== VERİ =================== */
 const LS='detoks-bahcesi-v1';
 let D=null;
-function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null}}
+function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null} if(D&&!D.cards)D.cards=[]}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem(LS,JSON.stringify(D))}
 function dkey(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
 function day(k=dkey()){if(!D.days[k])D.days[k]={screen:null,ch:[],urges:0,detox:0,success:false};return D.days[k]}
@@ -516,6 +563,9 @@ const ACH=[
  {id:'a10',ico:'🏔️', n:'Derin Sessizlik',  d:'Toplam 500 dk detoks yap',            c:()=>D.totals.detox>=500},
  {id:'a11',ico:'✅', n:'Tam Gün',           d:'Bir günde 5 görevin hepsini yap',     c:()=>Object.values(D.days).some(x=>(x.ch||[]).length>=5)},
  {id:'a12',ico:'🌟', n:'Bilge Bahçıvan',    d:'Seviye 10\'a ulaş',                   c:()=>level().lv>=10},
+ {id:'a13',ico:'🧠', n:'Meraklı Zihin',     d:'10 bilgi kartı oku',                  c:()=>D.cards.length>=10},
+ {id:'a14',ico:'🦉', n:'Bilge Baykuş',      d:'30 kartın hepsini oku',               c:()=>D.cards.length>=30},
+ {id:'a15',ico:'🌅', n:'Niyetli Sabahlar',  d:'7 sabah niyeti yaz',                  c:()=>Object.values(D.days).filter(x=>x.intent).length>=7},
 ];
 function checkAch(){
   ACH.forEach(a=>{
@@ -557,11 +607,13 @@ function renderToday(){
   const lEl=document.getElementById('dLeft');
   lEl.textContent=(left>=0?fmtMin(left):'-'+fmtMin(-left));lEl.style.color=left>=0?'':'var(--bad)';
   if(d.screen!=null){
-    const h=Math.floor(d.screen/60);document.getElementById('inH').value=h;document.getElementById('inM').value=d.screen-h*60;
+    const act=document.activeElement,typing=act&&(act.id==='inH'||act.id==='inM');
+    if(!typing){const h=Math.floor(d.screen/60);document.getElementById('inH').value=h;document.getElementById('inM').value=d.screen-h*60}
     const s=document.getElementById('statusMsg');
     if(d.success){s.className='statusMsg ok';s.innerHTML='🌱 Harika! Bugün hedefin <b>'+fmtMin(t-d.screen)+'</b> altındasın. Bahçene bir ağaç dikildi.'}
     else{s.className='statusMsg over';s.innerHTML='🍂 Bugün hedefi <b>'+fmtMin(d.screen-t)+'</b> aştın. Sorun değil — yarın dalga senin. Kaydettiğin için +XP aldın; dürüstlük ilerlemenin yarısıdır.'}
   }
+  renderIntent();
 }
 
 /* =================== EKRAN SÜRESİ KAYDI =================== */
@@ -639,6 +691,7 @@ function renderGarden(){
     fh+='<circle class="fly" cx="'+(30+r*940).toFixed(0)+'" cy="'+(40+r2*200).toFixed(0)+'" r="2.2" fill="#ffe9a3" style="animation-delay:'+(r*6).toFixed(1)+'s"/>';
   }
   f.innerHTML=fh;
+  renderWeeds();renderOwl();
 }
 function renderStars(){
   const g=document.getElementById('gStars');let h='';
@@ -647,6 +700,163 @@ function renderStars(){
     h+='<circle class="star" cx="'+(r*1000).toFixed(0)+'" cy="'+(r2*230).toFixed(0)+'" r="'+(0.6+r3*1.3).toFixed(1)+'" fill="#dfe9f5" style="animation-delay:'+(r3*4).toFixed(1)+'s;animation-duration:'+(2.2+r*3).toFixed(1)+'s"/>';
   }
   g.innerHTML=h;
+}
+
+/* =================== YABANİ OTLAR =================== */
+function badStreak(){
+  let n=0,d=new Date();
+  const t=D.days[dkey(d)];
+  if(!t||t.screen==null)d.setDate(d.getDate()-1);
+  while(true){const x=D.days[dkey(d)];if(x&&x.screen!=null&&!x.success){n++;d.setDate(d.getDate()-1)}else break}
+  return n;
+}
+function renderWeeds(){
+  const g=document.getElementById('gWeeds'),note=document.getElementById('weedNote');
+  if(badStreak()<3){g.innerHTML='';note.style.display='none';return}
+  note.style.display='block';
+  let h='';
+  for(let i=0;i<9;i++){
+    const r=Math.abs(Math.sin(i*73.3))%1,r2=Math.abs(Math.sin(i*41.9))%1;
+    const x=170+r*760,y=400+r2*24,s=0.8+r2*0.5;
+    h+='<g class="weedSway" style="animation-delay:'+(r*2).toFixed(1)+'s" transform="translate('+x.toFixed(0)+','+y.toFixed(0)+') scale('+s.toFixed(2)+')">'
+     +'<path d="M0,0 C-1,-8 -6,-12 -8,-18" stroke="#9a9a52" stroke-width="2" fill="none"/>'
+     +'<path d="M0,0 C0,-9 1,-14 0,-20" stroke="#8a8a4a" stroke-width="2" fill="none"/>'
+     +'<path d="M0,0 C1,-8 6,-11 8,-16" stroke="#a8a862" stroke-width="2" fill="none"/></g>';
+  }
+  g.innerHTML=h;
+}
+
+/* =================== BAHÇE BAYKUŞU =================== */
+function owlMood(){
+  if(badStreak()>=3)return'uzgun';
+  if(streak()>=1)return'mutlu';
+  if(Object.values(D.days).some(x=>x.screen!=null))return'sakin';
+  return'yeni';
+}
+function owlSVG(scale,sad){
+  const eyes=sad
+    ?'<circle cx="-6" cy="-26" r="4.5" fill="#fff"/><circle cx="6" cy="-26" r="4.5" fill="#fff"/><circle cx="-6" cy="-24.5" r="2.2" fill="#222"/><circle cx="6" cy="-24.5" r="2.2" fill="#222"/><path d="M-11,-31 L-2,-28" stroke="#4a3826" stroke-width="1.6" stroke-linecap="round"/><path d="M11,-31 L2,-28" stroke="#4a3826" stroke-width="1.6" stroke-linecap="round"/>'
+    :'<circle cx="-6" cy="-26" r="4.5" fill="#fff"/><circle cx="6" cy="-26" r="4.5" fill="#fff"/><circle cx="-6" cy="-26" r="2.4" fill="#222"/><circle cx="6" cy="-26" r="2.4" fill="#222"/><g class="owlBlink"><circle cx="-6" cy="-26" r="4.6" fill="#8a6f4d"/><circle cx="6" cy="-26" r="4.6" fill="#8a6f4d"/></g>';
+  return '<g transform="scale('+scale+')">'
+    +'<polygon points="-11,-34 -7,-41 -3,-33" fill="#7a6244"/><polygon points="11,-34 7,-41 3,-33" fill="#7a6244"/>'
+    +'<ellipse cx="0" cy="-16" rx="13" ry="16" fill="#8a6f4d"/>'
+    +'<ellipse cx="0" cy="-12" rx="8.5" ry="10" fill="#c9b08a"/>'
+    +'<ellipse cx="-11" cy="-15" rx="4" ry="9" fill="#7a6244"/><ellipse cx="11" cy="-15" rx="4" ry="9" fill="#7a6244"/>'
+    +'<circle cx="0" cy="-26" r="10.5" fill="#8a6f4d"/>'
+    +eyes
+    +'<polygon points="0,-23 -2.5,-19.5 2.5,-19.5" fill="#e8a15f"/>'
+    +'<path d="M-4,-1 L-4,2 M4,-1 L4,2" stroke="#e8a15f" stroke-width="2"/>'
+    +'</g>';
+}
+function renderOwl(){
+  const g=document.getElementById('gOwl');
+  const sad=owlMood()==='uzgun',s=streak();
+  let h='<g transform="translate(96,414)">'
+    +'<ellipse cx="0" cy="1" rx="17" ry="5" fill="#0a1c14"/>'
+    +'<rect x="-12" y="-26" width="24" height="26" rx="4" fill="#5c4433"/><ellipse cx="0" cy="-26" rx="12" ry="4.5" fill="#6e5340"/>'
+    +'<g transform="translate(0,-28)'+(sad?' rotate(-5)':'')+'">'+owlSVG(1,sad)+'</g>';
+  const babies=s>=21?3:s>=14?2:s>=7?1:0;
+  const bx=[27,-27,42];
+  for(let i=0;i<babies;i++)h+='<g transform="translate('+bx[i]+',1)">'+owlSVG(0.55,false)+'</g>';
+  h+='</g>';
+  g.innerHTML=h;
+}
+const OWLMSG={
+  mutlu:['Seninle gurur duyuyorum! 🌿','Bahçe bugün daha güzel kokuyor.','Devam et — dallar dolacak!','Bugün de buradasın, ekranda değil. Bravo.'],
+  uzgun:['Zor günler geçer... Ben buradayım. 🍂','Bir yeşil gün her şeyi değiştirir.','Otları birlikte temizleriz, sen yeter ki gel.'],
+  sakin:['Hoş geldin. Bugün nasılsın?','Gökyüzü bu akşam çok berrak.','Yıldızları saymayı denedin mi hiç?'],
+  yeni:['Merhaba! Ben bu bahçenin bekçisiyim. 🦉','İlk kaydını girdiğinde büyü başlar.','Ağaçlar seni bekliyor...']
+};
+function owlClick(){const a=OWLMSG[owlMood()];toast('🦉 '+a[Math.floor(Math.random()*a.length)]);sndSoft()}
+
+/* =================== BİLGİ KARTLARI =================== */
+const KARTLAR=[
+ {e:'🧪',t:'Dopamin nedir?',x:"Dopamin zevk molekülü değil, beklenti molekülüdür. Telefonu her eline alışında beynin ödülün kendisini değil, ödül ihtimalini arar. Bu yüzden hiçbir güzel şey bulamasan da kaydırmaya devam edersin — beynin \"belki bir sonrakinde\" der."},
+ {e:'🎰',t:'Cebindeki kumarhane',x:"Sonsuz akış, kumarhane makinesiyle aynı prensiple çalışır: değişken ödül. Ne zaman iyi bir içerik geleceği belli olmadığı için beyin sürekli \"bir kez daha\" der. Bu tesadüf değil — slot makinelerini bağımlılık yapıcı kılan mekanizmanın bilinçli bir kopyasıdır."},
+ {e:'🔄',t:'Çek-yenile kolu',x:"Aşağı çekip yenileme hareketi, kumarhane kolundan esinlenmiştir: belirsiz ödül + fiziksel hareket = güçlü alışkanlık döngüsü. Elin bunu sen farkına varmadan yapıyorsa, döngü çoktan kurulmuş demektir. Fark etmek, kırmanın ilk yarısıdır."},
+ {e:'🔴',t:'Kırmızının gücü',x:"Bildirim rozetleri neden kırmızı? Çünkü kırmızı, beyinde aciliyet ve tehlike sinyali tetikler. O sayıyı görüp açmamak gerçek bir irade savaşıdır. Rozetleri kapatmak, bu savaşı hiç başlamadan kazanmaktır: Ayarlar → Bildirimler → Rozetler kapalı."},
+ {e:'📱',t:'Ortalama insan',x:"Dünya ortalaması günde yaklaşık 6 saat 40 dakika ekran süresi. Bu yılda ~100 gün, 80 yıllık bir ömürde yaklaşık 20 yıl eder. Bu kartı okuyorsan, o 20 yılın bir kısmını geri almaya başladın demektir."},
+ {e:'🧲',t:'Ürün sensin',x:"Sosyal medya şirketlerinin ürünü uygulama değil — senin dikkatin. Ne kadar uzun kalırsan o kadar reklam görürsün; binlerce mühendisin tek işi seni ekranda tutmaktır. Karşında zayıf iraden değil, koca bir endüstri var. Bu yüzden sistem kurmak şart, kendini suçlamak yersiz."},
+ {e:'⏰',t:'Dikkat kalıntısı',x:"Telefona \"sadece 10 saniye\" baksan bile, zihninin önceki işe tam dönmesi 20 dakikayı bulabilir. Buna dikkat kalıntısı denir. Güne yayılmış 50 küçük bakış, günün tamamını bölünmüş yaşamak demektir."},
+ {e:'😴',t:'Ekran ve uyku',x:"Ekran ışığı melatonini (uyku hormonunu) baskılar; ama asıl zararlı olan içeriktir — yatakta kaydırmak beyni gündüz modunda tutar. Yatmadan 1 saat önce bırakmak, uyku kalitesinde gözle görülür fark yaratır. Görev listesindeki 🌙 maddesi tam bunun için."},
+ {e:'👻',t:'Hayalet titreşim',x:"Telefonun titrediğini hissedip baktığında hiçbir şey olmaması: hayalet titreşim sendromu. Beynin telefonu artık bedeninin bir uzantısı olarak kodladığının işaretidir. İyi haber: mesafe arttıkça bu his söner."},
+ {e:'🔁',t:'Alışkanlık döngüsü',x:"Her alışkanlık üç parçadır: tetikleyici → davranış → ödül. Davranışla (kaydırmayla) savaşmak en zor yoldur. Tetikleyiciyi kaldır (telefon başka odada) ya da davranışı değiştir (dürtü gelince su iç) — döngü kendiliğinden zayıflar."},
+ {e:'🪑',t:'Ortam iradeyi yener',x:"Telefon görüş alanındayken — kapalı bile olsa — zihinsel performans ölçülebilir şekilde düşer; beynin bir kısmı sürekli onu \"görmezden gelmekle\" meşguldür. En güçlü strateji irade değil, mesafedir. Gözden ırak olan, zihinden de ırak olur."},
+ {e:'😐',t:'Sıkılmak süper güçtür',x:"Beyin sıkıldığında \"varsayılan mod ağı\" devreye girer: hayal kurma, planlama ve yaratıcılık bu modda çalışır. Her boş anı telefonla doldurmak, bu modu hiç çalıştırmamak demektir. Kuyrukta beklerken sıkıl — bu bir kayıp değil, antrenman."},
+ {e:'🎯',t:'Eğer-o zaman planı',x:"\"Daha az bakacağım\" işe yaramaz; \"yemekten sonra dürtü gelirse su içeceğim\" işe yarar. Bilim buna uygulama niyeti diyor: Eğer X olursa, Y yapacağım. Net kural, bulanık hedefi her zaman yener. Kendi eğer-o zaman kuralını bugün yaz."},
+ {e:'🌊',t:'Dürtü 90 saniyedir',x:"Nörolojik olarak bir dürtü dalgası ortalama 90 saniyede yükselir ve söner — sen hiçbir şey yapmasan bile. Dürtüyle savaşmak onu büyütür; izlemek söndürür. Dürtü Anı sekmesindeki nefes egzersizi tam bu bilime dayanır."},
+ {e:'📉',t:'Kötü gün = veri',x:"Hedefi aştığın gün başarısızlık değil, bilgidir: Ne tetikledi? Hangi saatteydi? Yanında kim vardı? Kayıt tutmaya devam eden kişi, kötü günü bile ilerlemeye çevirir. Bahçedeki otlar ceza değil, hatırlatmadır."},
+ {e:'🆔',t:'Kimlik değişimi',x:"\"Telefonu bırakmaya çalışan bağımlı\" yerine kendini \"telefonu az kullanan biri\" olarak tanımla. Davranış hedefi yerine kimlik hedefi kur: \"Ben sabahları telefona bakmayan biriyim.\" Beyin, kimliğiyle çelişen davranışı zamanla terk eder."},
+ {e:'🎭',t:'Vitrin hayatlar',x:"Sosyal medyada gördüğün, insanların hayatı değil; hayatlarının fragmanıdır. Kendi perde arkanı başkalarının vitriniyle kıyaslamak kimyasal olarak mutsuzluk üretir. Akışı kapattığında kıyasladığın şey de kapanır."},
+ {e:'📵',t:'JOMO',x:"FOMO'nun (kaçırma korkusunun) ilacı JOMO'dur: kaçırmanın sevinci. Evet, o akışta olup bitenleri kaçırıyorsun — ama karşılığında kendi hayatını yakalıyorsun. Kaçırdığın gönderiyi bir hafta sonra kimse hatırlamıyor; kaçırdığın günü sen hatırlıyorsun."},
+ {e:'🥱',t:'Detoks efsanesi',x:"Dopamini \"sıfırlayamazsın\" — o bir yaşam molekülüdür, düşmanın değil. Yapabileceğin şey: ucuz dopamin kaynaklarını (kaydırma) yavaş ama doyurucu olanlarla (spor, üretmek, yüz yüze sohbet) değiştirmek. Amaç yoksunluk değil, takas."},
+ {e:'🚶',t:'Yürüyüşün gücü',x:"20 dakikalık telefonsuz yürüyüş; ruh halini, yaratıcılığı ve öz-denetimi ölçülebilir biçimde artırır. Dürtü en çok otururken gelir — ayağa kalkmak bile dürtünün yarısını öldürür. Görevlerdeki 🚶 maddesi süs değil, ilaç."},
+ {e:'📚',t:'Derin okuma kası',x:"Sürekli kaydırma, beyni tarama moduna alıştırır; uzun metin okuma becerisi gerçekten körelir. İyi haber: kas gibidir, geri gelir. Günde 10 sayfayla başla — ilk hafta zor, üçüncü hafta zevk."},
+ {e:'🍅',t:'Tek işin gücü',x:"Beyin çoklu görev yapamaz; görevler arasında geçiş yapar ve her geçişte enerji sızdırır. Telefonu uzaklaştırıp 25 dakika tek işe odaklanmak (Pomodoro tekniği) üretkenliği ikiye katlayabilir. Detoks Seansı sekmesi bunun için de kullanılabilir."},
+ {e:'🌫️',t:'Gri dünya',x:"Telefonu gri tonlamaya almak, ikonların ve akışların renk cazibesini öldürür — yemeğin kokusunu almadan yemek gibi. Denemesi bedava: Ayarlar → Erişilebilirlik → Ekran ve Metin Boyutu → Renk Filtreleri → Gri Tonlama. İlk gün garip, üçüncü gün özgürlük."},
+ {e:'🔕',t:'Bildirim diyeti',x:"Her bildirim, birinin senin zamanın üzerinde hak iddia etmesidir. Soru şu: \"Bu uygulama beni ne zaman isterse bölebilir mi?\" Cevap hayırsa bildirimi kapat. İnsanlardan gelenler kalsın, makinelerden gelenler gitsin."},
+ {e:'🛏️',t:'Yatak odası kuralı',x:"Telefonu yatak odasının dışında şarj etmek; gece kaydırmasını, sabah refleksini ve uyku kalitesini tek hamlede çözer. \"Çalar saatim o ama\" — ucuz bir çalar saat, 20 yıllık dikkatinden ucuzdur."},
+ {e:'🌅',t:'İlk saat kuralı',x:"Uyanır uyanmaz telefona bakmak, güne tepki modunda başlamaktır: başkalarının gündemi, kahvaltıdan önce zihnine girer. İlk saati kendine ayır — gün senin gündeminle başlasın. Görevlerdeki 🌅 maddesi bu yüzden listenin başında."},
+ {e:'🤝',t:'Yalnız değilsin',x:"Bağımlılıktan çıkışta en güçlü faktörlerden biri sosyal bağdır. Ekran hedefini bir arkadaşına söyle, birlikte azaltın, haftalık sonuçları paylaşın. Utanç izolasyonda büyür, bağlantıda ölür."},
+ {e:'🧩',t:'Boşluğu doldur',x:"Telefon bir boşluğu dolduruyordu; onu çekince boşluk geri gelir ve plan yoksa seni geri çağırır. Her azalttığın saat için yerine ne koyacağını önceden seç: kitap, spor, yemek yapmak, birini aramak. Boş kalan yer, dolu gelen yerdir."},
+ {e:'📈',t:'%80 kuralı',x:"90 gün boyunca %80 uyum, 10 gün %100 mükemmellikten sonsuz kat iyidir. Kötü günün olacak — sistemin (seri, bahçe, kayıt) seni yakalamak için var. Bırakan kaybeder, devam eden kazanır. Hepsi bu."},
+ {e:'🌳',t:'Bahçıvan oldun',x:"30 karta ulaştın. Artık mekanizmayı biliyorsun: tetikleyicileri kaldır, dürtüde sörf yap, boşluğu doldur, kaydet ve devam et. Bahçen büyüdükçe sen de büyüyorsun. Son görev: bu öğrendiklerini ihtiyacı olan birine anlat — öğreten, iki kez öğrenir. 🦉"},
+];
+function renderCards(){
+  const dayN=Math.max(0,daysSince(D.plan.start))+1;
+  document.getElementById('kartProg').textContent=D.cards.length+'/'+KARTLAR.length+' okundu';
+  document.getElementById('kartList').innerHTML=KARTLAR.map((k,i)=>{
+    if(i>=dayN)return '<div class="kart locked"><div class="head"><div class="ico">🔒</div><div class="t">'+k.t+'</div><div class="st">Gün '+(i+1)+'\'de açılır</div></div></div>';
+    const read=D.cards.includes(i);
+    return '<div class="kart'+(read?' read':'')+'" id="kart'+i+'"><div class="head" onclick="toggleKart('+i+')"><div class="ico">'+k.e+'</div><div class="t">'+k.t+'</div><div class="st">'+(read?'✓ okundu':'● yeni')+'</div></div><div class="body">'+k.x+'</div></div>';
+  }).join('');
+}
+function toggleKart(i){
+  const el=document.getElementById('kart'+i);if(!el)return;
+  const opening=!el.classList.contains('open');
+  if(opening&&!D.cards.includes(i)){
+    D.cards.push(i);addXP(5,'Kart okundu 🧠');
+    renderCards();const el2=document.getElementById('kart'+i);if(el2)el2.classList.add('open');
+  }else{el.classList.toggle('open')}
+}
+
+/* =================== SABAH NİYETİ =================== */
+let intentEditing=false;
+function renderIntent(){
+  if(document.activeElement&&document.activeElement.id==='intentInput')return;
+  const ib=document.getElementById('intentBox'),d=day();
+  if(d.intent&&!intentEditing){
+    ib.innerHTML='<div class="statusMsg ok" style="display:block;margin-top:0">🌅 '+esc(d.intent)+'</div><button class="btn ghost" style="margin-top:10px;padding:7px 14px;font-size:.8rem" onclick="editIntent()">Değiştir</button>';
+  }else{
+    ib.innerHTML='<div style="display:flex;gap:10px;flex-wrap:wrap"><input type="text" id="intentInput" placeholder="Örn: Sadece mesajlar ve banka; akşam 30 dk video" style="flex:1;min-width:220px" value="'+(d.intent?esc(d.intent):'')+'"><button class="btn" onclick="saveIntent()">Kaydet</button></div>';
+  }
+}
+function editIntent(){intentEditing=true;renderIntent()}
+function saveIntent(){
+  const v=(document.getElementById('intentInput').value||'').trim();
+  if(!v){toast('Bir niyet yaz 🙂');return}
+  const d=day(),first=!d.intent;d.intent=v;intentEditing=false;save();
+  if(first)addXP(5,'Sabah niyeti kuruldu 🌅');else toast('Niyet güncellendi ✔');
+  renderToday();
+}
+
+/* =================== DÜNYA KIYASI =================== */
+function renderCompare(){
+  const box=document.getElementById('cmpBox');
+  const keys=[],now=new Date();
+  for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);keys.push(dkey(d))}
+  const vals=keys.map(k=>(D.days[k]||{}).screen).filter(v=>v!=null);
+  if(!vals.length){box.innerHTML='<p class="muted">Kıyas için önce birkaç gün ekran süresi gir 🙂</p>';return}
+  const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  const WORLD=400,TR=420,max=Math.max(avg,TR)*1.1;
+  const row=(lbl,v,col)=>'<div class="cmpRow"><div class="l"><b>'+lbl+'</b><span>'+fmtMin(v)+'</span></div><div class="cmpBar"><i style="width:'+(v/max*100).toFixed(0)+'%;background:'+col+'"></i></div></div>';
+  let msg;
+  if(avg<WORLD){const yil=Math.round((WORLD-avg)*365/1440);msg='🌱 Dünya ortalamasından <b>'+fmtMin(WORLD-avg)+'</b> daha az ekrandasın — bu tempoyla yılda yaklaşık <b>'+yil+' günü</b> hayata geri kazanıyorsun.'}
+  else{msg='🍂 Şu an dünya ortalamasının üzerindesin — ama artık ölçüyorsun ve fark bu. Plan seni adım adım aşağı taşıyacak.'}
+  box.innerHTML=row('Sen (son 7 gün ort.)',avg,'linear-gradient(90deg,#3fae7a,#7ed491)')
+    +row('Dünya ortalaması',WORLD,'#38505a')
+    +row('Türkiye ortalaması (yaklaşık)',TR,'#544a36')
+    +'<p class="muted" style="margin-top:8px">'+msg+'</p>';
 }
 
 /* =================== ALINTILAR =================== */
@@ -671,7 +881,9 @@ function rotateQuote(){
 let bTimer=null,bAlive=false;
 const PHASES=[['Nefes al 🌬️',4,1.4],['Tut ✋',4,1.4],['Ver 🍃',6,1]];
 function startBreath(){
-  document.getElementById('bReason').textContent=D.reason?'Hatırla: '+D.reason:'';
+  let bMsg=D.reason?'Hatırla: '+D.reason:'';
+  if(day().intent)bMsg+=(bMsg?'\n':'')+'🌅 Bugünkü niyetin: '+day().intent;
+  document.getElementById('bReason').textContent=bMsg;
   document.getElementById('breathOverlay').classList.add('on');
   bAlive=true;sndWave();
   runCycle(0,0);
@@ -796,6 +1008,7 @@ function renderStats(){
   document.getElementById('sSuccess').textContent=successCount();
   document.getElementById('sUrges').textContent=D.totals.urges;
   document.getElementById('sDetox').textContent=D.totals.detox;
+  renderCompare();
   renderChart();
 }
 function renderSettings(){
@@ -806,7 +1019,7 @@ function renderSettings(){
   document.getElementById('soundToggle').classList.toggle('done',D.sound);
   document.getElementById('reasonBox').value=D.reason||'';
 }
-function renderAll(){renderHeader();renderGarden();renderToday();renderStats();renderAch();renderSettings();renderSession()}
+function renderAll(){renderHeader();renderGarden();renderToday();renderStats();renderAch();renderCards();renderSettings();renderSession()}
 
 /* =================== SEKMELER =================== */
 function goTab(id){
@@ -837,7 +1050,7 @@ function finishOnboarding(){
   const g=Math.round(parseFloat(document.getElementById('obGoal').value)*60);
   const w=parseInt(document.getElementById('obWeeks').value);
   if(!b||!g||g>=b){toast('Hedef, şu anki süreden küçük olmalı 🙂');return}
-  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],
+  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],cards:[],
      totals:{urges:0,detox:0},session:null,sound:true,reason:document.getElementById('obReason').value.trim()};
   save();
   document.getElementById('obModal').classList.remove('on');
@@ -848,8 +1061,16 @@ function finishOnboarding(){
 /* =================== BAŞLAT =================== */
 load();
 renderStars();
+document.getElementById('gOwl').addEventListener('click',owlClick);
 if(!D){document.getElementById('obModal').classList.add('on')}
-else{renderAll()}
+else{
+  renderAll();
+  /* ?durtu kısayolu: ayrı ana ekran ikonundan gelen açılış direkt nefes egzersizini başlatır */
+  if(new URLSearchParams(location.search).has('durtu')){
+    history.replaceState(null,'',location.pathname);
+    setTimeout(startBreath,400);
+  }
+}
 rotateQuote();setInterval(rotateQuote,18000);
 setInterval(()=>{ /* gece yarısı geçişi: görünümü tazele */ renderToday();renderHeader() },60000);
 
