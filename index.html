@@ -247,6 +247,16 @@ label.f{display:block;font-size:.78rem;color:var(--dim);margin:10px 0 5px;text-t
 .hcell.ok{background:#2a7a55;color:#eafff3;font-weight:600}
 .hcell.over{background:#7a5a2b;color:#ffe9c4}
 .hcell.today{outline:2px solid var(--amber)}
+.hcell.frozen{background:#2b5f8a;color:#dcecf8}
+#nightOverlay{position:fixed;inset:0;background:rgba(3,7,14,.97);z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+#nightOverlay.on{display:flex}
+#nightOverlay p{color:var(--dim);line-height:1.65;max-width:440px}
+.testOpt{display:flex;gap:6px;margin-top:16px}
+.testOpt button{flex:1;padding:14px 4px;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:1.05rem;cursor:pointer;font-family:inherit;transition:.15s}
+.testOpt button:hover{border-color:#7ec8e8;background:#12283a}
+.coachItem{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.9rem;line-height:1.5}
+.coachItem:last-child{border:none;padding-bottom:0}
+.coachItem .ci{font-size:1.2rem}
 .wtab{width:100%;border-collapse:collapse;font-size:.88rem}
 .wtab th{color:var(--dim);font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;text-align:right;padding:4px 6px;font-weight:600}
 .wtab th:first-child{text-align:left}
@@ -266,6 +276,7 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
     <div class="hstats">
       <div class="chip fire"><b id="hStreak">0</b><span>Gün Seri</span></div>
       <div class="chip"><b id="hTrees">0</b><span>Ağaç</span></div>
+      <div class="chip" style="border-color:#2b5f8a" title="Her 7 yeşil gün = 1 dondurma hakkı; kötü bir gün serini kırmaz"><b id="hFreeze" style="color:#7ec8e8">0</b><span>🧊 Hak</span></div>
       <div class="lvlbox">
         <div class="t"><b id="hLvl">Seviye 1</b><span id="hXp">0 XP</span></div>
         <div class="bar"><i id="hLvlBar" style="width:0%"></i></div>
@@ -446,6 +457,14 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
       <div class="sc"><b id="sUrges">0</b><span>Yenilen Dürtü</span></div>
       <div class="sc"><b id="sDetox">0</b><span>Detoks Dakikası</span></div>
     </div>
+    <div class="card">
+      <h2>🧭 Akıllı Koç</h2>
+      <div id="coachBox"></div>
+    </div>
+    <div class="card">
+      <h2>📋 Bağımlılık Testi</h2>
+      <div id="testBox"></div>
+    </div>
     <div class="grid2">
       <div class="card">
         <h2>⏳ Geri Kazanılan Zaman</h2>
@@ -509,6 +528,12 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
       </div>
     </div>
     <div class="card">
+      <h2>🚨 Kriz Planı</h2>
+      <p class="muted">İyi gününde yaz, kötü gününde uygula: üst üste 3 gün hedef aşılırsa bu plan otomatik olarak karşına çıkar. Kriz anında plan düşünülmez — hazır plan uygulanır.</p>
+      <textarea id="crisisBox" style="min-height:110px;margin-top:8px" placeholder="Örn:&#10;1) Telefonu akşam 21:00'den sonra mutfakta bırak&#10;2) Bir arkadaşımı ara&#10;3) Yarın sabah 15 dk detoks seansıyla başla&#10;4) Sosyal medyayı 2 günlüğüne telefondan sil"></textarea>
+      <div style="margin-top:10px"><button class="btn" onclick="saveCrisis(false)">Kaydet</button></div>
+    </div>
+    <div class="card">
       <h2>🔊 Ses & Veri</h2>
       <div class="chItem" id="soundToggle" onclick="toggleSound()">
         <div class="box" id="soundBox"></div><div class="tx">Ses efektleri açık</div>
@@ -560,13 +585,42 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
   </div>
 </div>
 
+<!-- ============ KRİZ KARTI ============ -->
+<div class="modal" id="crisisModal">
+  <div class="mbox">
+    <h2>🚨 Zor Bir Dönemdesin</h2>
+    <p class="sub">Üst üste 3+ gün hedef aşıldı. Panik yok — tam da böyle günler için bir planın var. Yoksa şimdi yaz: gelecekteki sen, bugünkü sana teşekkür edecek.</p>
+    <textarea id="crisisText" style="min-height:130px" placeholder="Örn:&#10;1) Telefonu akşam 21:00'den sonra mutfakta bırak&#10;2) Bir arkadaşımı ara&#10;3) Yarın sabah 15 dk detoks seansıyla başla&#10;4) Sosyal medyayı 2 günlüğüne telefondan sil"></textarea>
+    <div style="margin-top:14px">
+      <button class="btn" style="width:100%" onclick="saveCrisis(true)">💪 Planı Kaydet ve 1. Maddeden Başla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GECE BEKÇİSİ ============ -->
+<div id="nightOverlay">
+  <div style="font-size:3.2rem">🌙</div>
+  <h2>Bahçe uyuyor...</h2>
+  <p>Saat 00:00–05:00 arası. Gece kaydırması, bağımlılığın en sevdiği kapıdır — ve bedelini yarınki iradenden öder. En güçlü hamlen şu an telefonu bırakmak.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <button class="btn" onclick="nightSleep()">😴 Haklısın, iyi geceler</button>
+    <button class="btn wave" onclick="nightUrge()">🌊 Dürtü geldi, nefes alayım</button>
+  </div>
+  <button class="btn ghost" onclick="closeNight()">Yine de devam et</button>
+</div>
+
+<!-- ============ BAĞIMLILIK TESTİ ============ -->
+<div class="modal" id="testModal">
+  <div class="mbox" id="testBody"></div>
+</div>
+
 <div id="toasts"></div>
 
 <script>
 /* =================== VERİ =================== */
 const LS='detoks-bahcesi-v1';
 let D=null;
-function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null} if(D){if(!D.cards)D.cards=[];if(!D.urgeLog)D.urgeLog=[];if(D.totals.roul==null)D.totals.roul=0}}
+function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null} if(D){if(!D.cards)D.cards=[];if(!D.urgeLog)D.urgeLog=[];if(!D.tests)D.tests=[];if(D.totals.roul==null)D.totals.roul=0;if(D.totals.freezeEarned==null)D.totals.freezeEarned=0;if(D.totals.freezeUsed==null)D.totals.freezeUsed=0}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem(LS,JSON.stringify(D))}
 function dkey(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
@@ -590,9 +644,10 @@ function addXP(n,msg){D.xp+=n;if(msg)toast(msg+' · +'+n+' XP');save();renderHea
 
 /* =================== SERİ / SAYIMLAR =================== */
 function streak(){
+  const ok=k=>{const x=D.days[k];return !!(x&&(x.success||x.frozen))};
   let s=0,d=new Date();
-  if(!(D.days[dkey(d)]||{}).success)d.setDate(d.getDate()-1);
-  while((D.days[dkey(d)]||{}).success){s++;d.setDate(d.getDate()-1)}
+  if(!ok(dkey(d)))d.setDate(d.getDate()-1);
+  while(ok(dkey(d))){s++;d.setDate(d.getDate()-1)}
   return s;
 }
 function successCount(){return Object.values(D.days).filter(x=>x.success).length}
@@ -647,6 +702,8 @@ const ACH=[
  {id:'a15',ico:'🌅', n:'Niyetli Sabahlar',  d:'7 sabah niyeti yaz',                  c:()=>Object.values(D.days).filter(x=>x.intent).length>=7},
  {id:'a16',ico:'🏷️', n:'Dürtü Dedektifi',  d:'10 dürtü etiketle',                   c:()=>D.urgeLog.length>=10},
  {id:'a17',ico:'🎡', n:'Çark Ustası',       d:'Ruletten 10 aktivite tamamla',        c:()=>D.totals.roul>=10},
+ {id:'a18',ico:'🧊', n:'Soğukkanlı',        d:'Bir seri dondurma hakkı kullan',      c:()=>D.totals.freezeUsed>=1},
+ {id:'a19',ico:'📋', n:'Aynaya Bakan',      d:'Bağımlılık testini çöz',              c:()=>D.tests.length>=1},
 ];
 function checkAch(){
   ACH.forEach(a=>{
@@ -708,7 +765,7 @@ function saveScreen(){
   if(first)addXP(10,'Gün kaydedildi');
   if(d.success&&!wasSuccess){plantTree(k);addXP(30,'Hedefin altında gün');leaves();sndOk()}
   if(!d.success&&wasSuccess){unplantTree(k)}
-  save();renderAll();
+  save();checkFreezeEarn();renderAll();
 }
 
 /* =================== BAHÇE =================== */
@@ -1060,7 +1117,8 @@ function renderHeat(){
   for(let d=1;d<=dim;d++){
     const k=m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const rec=D.days[k];let cls='';
-    if(rec&&rec.screen!=null)cls=rec.success?' ok':' over';
+    if(rec&&rec.frozen)cls=' frozen';
+    else if(rec&&rec.screen!=null)cls=rec.success?' ok':' over';
     h+='<div class="hcell'+cls+(k===tk?' today':'')+'">'+d+'</div>';
   }
   h+='</div>';
@@ -1098,6 +1156,150 @@ function renderWeek(){
     h+='<p class="muted" style="margin-top:10px">Kıyas için iki haftalık veri birikmesi gerek.</p>';
   }
   box.innerHTML=h;
+}
+
+/* =================== SERİ DONDURMA =================== */
+function freezeAvail(){return (D.totals.freezeEarned||0)-(D.totals.freezeUsed||0)}
+function checkFreezeEarn(){
+  const earned=Math.floor(successCount()/7);
+  if(earned>(D.totals.freezeEarned||0)){
+    D.totals.freezeEarned=earned;save();
+    toast('🧊 Seri dondurma hakkı kazandın! Her 7 yeşil gün = 1 hak',true);sndGold();
+  }
+}
+function checkFreeze(){
+  checkFreezeEarn();
+  const y=new Date();y.setDate(y.getDate()-1);const yk=dkey(y);
+  const yd=D.days[yk];
+  if(yd&&(yd.success||yd.frozen))return;
+  const b=new Date(y);b.setDate(b.getDate()-1);const bd=D.days[dkey(b)];
+  if(!(bd&&(bd.success||bd.frozen)))return;
+  if(freezeAvail()<=0)return;
+  if(!D.days[yk])D.days[yk]={screen:null,ch:[],urges:0,detox:0,success:false};
+  D.days[yk].frozen=true;D.totals.freezeUsed=(D.totals.freezeUsed||0)+1;save();
+  toast('🧊 Serin donduruldu! Dünkü boşluğu bir hak kapattı ('+freezeAvail()+' hak kaldı)',true);
+  checkAch();
+}
+
+/* =================== KRİZ KARTI =================== */
+function crisisCheck(){
+  if(badStreak()<3)return;
+  if(D.lastCrisis===dkey())return;
+  D.lastCrisis=dkey();save();
+  document.getElementById('crisisText').value=D.crisisPlan||'';
+  document.getElementById('crisisModal').classList.add('on');
+}
+function saveCrisis(fromModal){
+  const v=document.getElementById(fromModal?'crisisText':'crisisBox').value.trim();
+  D.crisisPlan=v;save();
+  if(fromModal){
+    document.getElementById('crisisModal').classList.remove('on');
+    toast(v?'Plan hazır. Şimdi 1. maddeden başla 💪':'Kapatıldı — istersen planı Ayarlar\'dan yazabilirsin');
+  }else toast('Kriz planı kaydedildi 🚨');
+  renderSettings();
+}
+
+/* =================== GECE BEKÇİSİ =================== */
+function nightCheck(hh){
+  const h=hh!=null?hh:new Date().getHours();
+  if(h>=5)return;
+  document.getElementById('nightOverlay').classList.add('on');
+}
+function closeNight(){document.getElementById('nightOverlay').classList.remove('on')}
+function nightSleep(){closeNight();toast('İyi geceler. Yarın bahçede görüşürüz 🌙')}
+function nightUrge(){closeNight();startBreath()}
+
+/* =================== AKILLI KOÇ =================== */
+function coachTips(){
+  const tips=[];
+  const cnt={};D.urgeLog.forEach(u=>cnt[u.tag]=(cnt[u.tag]||0)+1);
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  if(top&&top[1]>=3){
+    const m={
+      sikinti:['🎡','Dürtülerinin başlıca kaynağı can sıkıntısı. Dürtü gelince Aktivite Ruleti\'ni çevir — eline hazır bir alternatif ver.'],
+      kaygi:['🧘','Kaygı anlarında ekran bir kaçış olmuş. Nefes egzersizini dürtü olmadan da kullan: günde 1 kez, sadece sakinleşmek için.'],
+      aliskanlik:['📍','Dürtülerin otomatik pilottan geliyor. Telefonun evdeki yerini değiştir — alışkanlık zinciri en kolay mekânla kırılır.'],
+      bildirim:['🔕','Dürtülerinin çoğunu bildirimler tetikliyor. Bugün 10 dakika ayır: insanlardan gelmeyen her bildirimi kapat.'],
+      sosyal:['👥','Sosyal ortamlar seni ekrana itiyor. Buluşmalarda telefonu masaya değil çantana koy — görünmeyen telefon çağırmaz.']
+    }[top[0]];
+    if(m)tips.push(m);
+  }
+  const gece=D.urgeLog.filter(u=>{const h=new Date(u.ts).getHours();return h>=22||h<6}).length;
+  if(gece>=3)tips.push(['🌙','Dürtülerin önemli kısmı gece geliyor. Telefonu yatak odası dışında şarj etmeyi dene — 25. bilgi kartı tam bunu anlatıyor.']);
+  if(badStreak()>=2)tips.push(['🌱','Üst üste hedef üstü günler var. Bugün küçük kazan: tek bir görevi işaretle ve akşam süreni mutlaka gir — kayıt, kontrolün ilk adımıdır.']);
+  const yedi=[];for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);yedi.push(D.days[dkey(d)]||{})}
+  if(!yedi.some(d=>(d.detox||0)>0))tips.push(['🕯️','Bu hafta hiç detoks seansı yok. 15 dakikalık bir seansla başla — bahçene çiçek de ekler.']);
+  const dayN=Math.max(0,daysSince(D.plan.start))+1;
+  if(Math.min(dayN,KARTLAR.length)-D.cards.length>=3)tips.push(['🧠','Okunmamış bilgi kartların birikti. Günde 1 dakika: düşmanını tanımak direnci büyütür.']);
+  if(freezeAvail()===0&&streak()>=4)tips.push(['🧊','Serin büyüyor ama dondurma hakkın yok. '+(7-(successCount()%7))+' yeşil gün sonra 1 hak kazanacaksın — o güne kadar dikkat.']);
+  if(!tips.length)tips.push(['🌿','Veri biriktikçe burada sana özel öneriler çıkacak. Şimdilik en iyi hamle: her akşam ekran süreni girmek.']);
+  return tips.slice(0,3);
+}
+function renderCoach(){
+  document.getElementById('coachBox').innerHTML=coachTips().map(t=>'<div class="coachItem"><div class="ci">'+t[0]+'</div><div>'+t[1]+'</div></div>').join('');
+}
+
+/* =================== BAĞIMLILIK TESTİ =================== */
+const TESTQ=[
+ 'Telefon yüzünden planladığım işleri aksatıyorum.',
+ 'Telefon kullanmaktan dolayı işime/derslerime odaklanmakta zorlanıyorum.',
+ 'Telefonsuz kaldığımda kendimi huzursuz ve gergin hissediyorum.',
+ 'Telefonum yanımda değilken sürekli aklımda oluyor.',
+ 'Telefonuma bakmadan uzun süre durmak bana zor geliyor.',
+ 'Telefonu her seferinde planladığımdan çok daha uzun kullanıyorum.',
+ 'Çevremdekiler telefonu çok kullandığımı söylüyor.',
+ 'Kullanımı azaltmayı denediğimde başarısız oluyorum.',
+ 'Telefon yüzünden uykumdan çalıyorum.',
+ 'Paylaşımları veya mesajları kaçırma korkusu yaşıyorum.',
+];
+let testAns=[];
+function startTest(){testAns=[];document.getElementById('testModal').classList.add('on');renderTestQ()}
+function renderTestQ(){
+  const i=testAns.length;
+  document.getElementById('testBody').innerHTML=
+    '<h2>📋 Soru '+(i+1)+' / 10</h2>'
+    +'<p class="sub" style="font-size:1.02rem;color:var(--txt);margin:14px 0;line-height:1.6">'+TESTQ[i]+'</p>'
+    +'<div class="testOpt">'+[1,2,3,4,5,6].map(v=>'<button onclick="answerTest('+v+')">'+v+'</button>').join('')+'</div>'
+    +'<div style="display:flex;justify-content:space-between;margin-top:6px" class="muted"><span>Hiç katılmıyorum</span><span>Tamamen katılıyorum</span></div>'
+    +'<div style="margin-top:18px"><button class="btn ghost" onclick="document.getElementById(\'testModal\').classList.remove(\'on\')">Vazgeç</button></div>';
+}
+function answerTest(v){
+  testAns.push(v);sndSoft();
+  if(testAns.length<TESTQ.length){renderTestQ();return}
+  const score=testAns.reduce((a,b)=>a+b,0);
+  const prev=D.tests.length?D.tests[D.tests.length-1].s:null;
+  D.tests.push({d:dkey(),s:score});save();checkAch();
+  const band=score<=21?['🌱','Düşük risk','Kontrol büyük ölçüde sende — bunu koru.']
+    :score<=33?['🌿','Orta risk','Alışkanlıklar yer etmeye başlamış; değişim için tam doğru zamandasın.']
+    :score<=45?['🍂','Yüksek risk','Bağımlılık günlük hayatını etkiliyor. Bu program tam senin için.']
+    :['🔥','Çok yüksek risk','Ciddi bir tablo. Sistemli ilerle — gerekirse profesyonel destek düşünmekten çekinme.'];
+  let cmp='';
+  if(prev!=null){const df=score-prev;
+    cmp=df<0?'<p class="sub" style="color:var(--leaf)">Önceki teste göre '+(-df)+' puan iyileşme! 🎉</p>'
+      :df>0?'<p class="sub">Önceki teste göre +'+df+' puan — dalgalanma normaldir, devam.</p>'
+      :'<p class="sub">Öncekiyle aynı puan — istikrar da bir veridir.</p>'}
+  document.getElementById('testBody').innerHTML=
+    '<h2>'+band[0]+' '+score+' / 60 — '+band[1]+'</h2>'
+    +'<p class="sub" style="margin:12px 0">'+band[2]+'</p>'+cmp
+    +'<p class="sub">Ayda bir tekrarla; puanının düşüşü, ekran süresinden bile iyi bir ilerleme kanıtıdır.</p>'
+    +'<div style="margin-top:14px"><button class="btn" style="width:100%" onclick="document.getElementById(\'testModal\').classList.remove(\'on\');renderStats()">Tamam</button></div>';
+  sndOk();
+}
+function renderTestCard(){
+  const box=document.getElementById('testBox');
+  if(!D.tests.length){
+    box.innerHTML='<p class="muted">10 soruluk öz-değerlendirme: bağımlılık şiddetini ölç, ayda bir tekrarla ve puanının düşüşünü izle — ekran süresinin yanında ikinci "iyileşiyorum" kanıtın.</p><div style="margin-top:12px"><button class="btn" onclick="startTest()">📋 Testi Çöz</button></div>';
+    return;
+  }
+  const last=D.tests[D.tests.length-1],fark=daysSince(last.d);
+  const bars=D.tests.slice(-6).map(t=>
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px">'
+    +'<b style="font-size:.78rem">'+t.s+'</b>'
+    +'<div style="width:32px;height:'+Math.max(8,t.s/60*70).toFixed(0)+'px;background:#2b5f8a;border-radius:6px 6px 0 0"></div>'
+    +'<span class="muted" style="font-size:.62rem">'+t.d.slice(8,10)+'.'+t.d.slice(5,7)+'</span></div>').join('');
+  box.innerHTML='<div style="display:flex;gap:12px;align-items:flex-end;margin-bottom:12px">'+bars+'</div>'
+    +'<p class="muted">Son test: <b>'+last.s+'/60</b> ('+(fark===0?'bugün':fark+' gün önce')+'). '+(fark>=28?'Yeniden çözme vakti geldi 📆':'Ayda bir tekrar öneririm.')+'</p>'
+    +'<div style="margin-top:10px"><button class="btn ghost" onclick="startTest()">Yeniden Çöz</button></div>';
 }
 
 /* =================== SABAH NİYETİ =================== */
@@ -1278,6 +1480,7 @@ function renderHeader(){
   const l=level();
   document.getElementById('hStreak').textContent=streak();
   document.getElementById('hTrees').textContent=D.garden.filter(g=>g.t==='tree').length;
+  document.getElementById('hFreeze').textContent=freezeAvail();
   document.getElementById('hLvl').textContent='Seviye '+l.lv;
   document.getElementById('hXp').textContent=D.xp+' XP';
   document.getElementById('hLvlBar').style.width=(l.cur/l.need*100).toFixed(0)+'%';
@@ -1294,6 +1497,7 @@ function renderStats(){
   document.getElementById('sSuccess').textContent=successCount();
   document.getElementById('sUrges').textContent=D.totals.urges;
   document.getElementById('sDetox').textContent=D.totals.detox;
+  renderCoach();renderTestCard();
   renderSaved();renderTrig();renderHeat();renderWeek();
   renderCompare();
   renderChart();
@@ -1305,6 +1509,7 @@ function renderSettings(){
   document.getElementById('soundBox').textContent=D.sound?'✔':'';
   document.getElementById('soundToggle').classList.toggle('done',D.sound);
   document.getElementById('reasonBox').value=D.reason||'';
+  document.getElementById('crisisBox').value=D.crisisPlan||'';
 }
 function renderAll(){renderHeader();renderGarden();renderToday();renderStats();renderAch();renderCards();renderSettings();renderSession()}
 
@@ -1337,8 +1542,8 @@ function finishOnboarding(){
   const g=Math.round(parseFloat(document.getElementById('obGoal').value)*60);
   const w=parseInt(document.getElementById('obWeeks').value);
   if(!b||!g||g>=b){toast('Hedef, şu anki süreden küçük olmalı 🙂');return}
-  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],cards:[],urgeLog:[],
-     totals:{urges:0,detox:0,roul:0},session:null,sound:true,reason:document.getElementById('obReason').value.trim()};
+  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],cards:[],urgeLog:[],tests:[],
+     totals:{urges:0,detox:0,roul:0,freezeEarned:0,freezeUsed:0},session:null,sound:true,reason:document.getElementById('obReason').value.trim()};
   save();
   document.getElementById('obModal').classList.remove('on');
   toast('🌱 Bahçen kuruldu. İlk hedefin: günde '+fmtMin(targetFor(dkey())));
@@ -1352,11 +1557,15 @@ buildWheel();
 document.getElementById('gOwl').addEventListener('click',owlClick);
 if(!D){document.getElementById('obModal').classList.add('on')}
 else{
+  checkFreeze();
   renderAll();
   /* ?durtu kısayolu: ayrı ana ekran ikonundan gelen açılış direkt nefes egzersizini başlatır */
   if(new URLSearchParams(location.search).has('durtu')){
     history.replaceState(null,'',location.pathname);
     setTimeout(startBreath,400);
+  }else{
+    nightCheck();
+    crisisCheck();
   }
 }
 rotateQuote();setInterval(rotateQuote,18000);
