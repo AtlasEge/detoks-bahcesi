@@ -217,6 +217,41 @@ label.f{display:block;font-size:.78rem;color:var(--dim);margin:10px 0 5px;text-t
 @keyframes owlblink{0%,90%,100%{transform:scaleY(.06)}93%,96%{transform:scaleY(1)}}
 .weedSway{animation:sway 3.5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
 @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+/* ---------- BAHÇE EVRİMİ ---------- */
+.flit{animation:flit 7s ease-in-out infinite}
+@keyframes flit{0%,100%{transform:translate(0,0)}25%{transform:translate(20px,-16px)}50%{transform:translate(-10px,-26px)}75%{transform:translate(-22px,-8px)}}
+.flap{animation:flap .4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes flap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.35)}}
+.birdfly{animation:birdfly linear infinite}
+@keyframes birdfly{from{transform:translateX(0)}to{transform:translateX(1160px)}}
+.deerBob{animation:deerbob 5s ease-in-out infinite}
+@keyframes deerbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+.shimmer{animation:shim 4s ease-in-out infinite}
+@keyframes shim{0%,100%{opacity:.12}50%{opacity:.4}}
+.snow{animation:snowfall linear infinite}
+@keyframes snowfall{from{transform:translateY(-12px)}to{transform:translateY(475px)}}
+.fallLeaf{animation:leaffall linear infinite}
+@keyframes leaffall{from{transform:translateY(-12px) rotate(0)}to{transform:translateY(475px) rotate(320deg)}}
+/* ---------- RULET ---------- */
+.wheelWrap{position:relative;max-width:290px;margin:0 auto}
+.wheelPtr{position:absolute;top:-8px;left:50%;transform:translateX(-50%);color:var(--amber);font-size:1.5rem;z-index:2;text-shadow:0 2px 8px #000}
+#wheelSvg{width:100%;display:block}
+#wheelG{transition:transform 4s cubic-bezier(.15,.7,.1,1);transform-origin:140px 140px}
+/* ---------- ETİKET / ISI HARİTASI / RAPOR ---------- */
+.tagBtn{background:#12283a;border:1px solid #2b5f8a;color:#cfe6f5;border-radius:12px;padding:10px 14px;font-size:.9rem;cursor:pointer;font-family:inherit;transition:.2s}
+.tagBtn:hover{border-color:#7ec8e8;transform:translateY(-2px)}
+.tagBtn.ghost{background:transparent;border-color:var(--line);color:var(--dim)}
+.heatGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.hlbl{font-size:.65rem;color:var(--dim);text-align:center;padding:2px 0}
+.hcell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.72rem;border-radius:7px;background:#0a1a20;color:var(--dim)}
+.hcell.ok{background:#2a7a55;color:#eafff3;font-weight:600}
+.hcell.over{background:#7a5a2b;color:#ffe9c4}
+.hcell.today{outline:2px solid var(--amber)}
+.wtab{width:100%;border-collapse:collapse;font-size:.88rem}
+.wtab th{color:var(--dim);font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;text-align:right;padding:4px 6px;font-weight:600}
+.wtab th:first-child{text-align:left}
+.wtab td{padding:6px;border-top:1px dashed var(--line);text-align:right}
+.wtab td:first-child{text-align:left;color:var(--dim)}
 footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
 </style>
 </head>
@@ -268,9 +303,12 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
         <path d="M0,318 Q220,258 470,305 T1000,295 L1000,460 0,460 Z" fill="#1b4436"/>
         <path d="M0,362 Q300,302 640,352 T1000,340 L1000,460 0,460 Z" fill="#16382d"/>
         <path d="M0,412 Q380,366 1000,398 L1000,460 0,460 Z" fill="#102a22"/>
+        <g id="gPond"></g>
         <g id="gPlants"></g>
         <g id="gWeeds"></g>
         <g id="gOwl"></g>
+        <g id="gCritters"></g>
+        <g id="gSeason"></g>
       </svg>
     </div>
     <div class="quote" id="quoteBox"></div>
@@ -351,6 +389,19 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
         <div style="margin-top:10px"><button class="btn ghost" onclick="saveReason()">Kaydet</button></div>
       </div>
     </div>
+    <div class="card">
+      <h2>🎡 Aktivite Ruleti</h2>
+      <p class="muted" style="margin-bottom:12px">"Şimdi ne yapsam?" deme — çevir, çark karar versin. Aktiviteyi yapınca +10 XP (günde en çok 3 kez).</p>
+      <div class="wheelWrap">
+        <div class="wheelPtr">▼</div>
+        <svg id="wheelSvg" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg"><g id="wheelG"></g></svg>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <div id="wheelResult" style="min-height:28px;font-size:1.05rem;margin-bottom:10px"></div>
+        <button class="btn wave" id="spinBtn" onclick="spinWheel()">🎡 Çevir!</button>
+        <button class="btn" id="didBtn" style="display:none" onclick="rouletteDone()">✔ Yaptım</button>
+      </div>
+    </div>
   </section>
 
   <!-- ============ SEANS ============ -->
@@ -394,6 +445,26 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
       <div class="sc"><b id="sSuccess">0</b><span>Başarılı Gün</span></div>
       <div class="sc"><b id="sUrges">0</b><span>Yenilen Dürtü</span></div>
       <div class="sc"><b id="sDetox">0</b><span>Detoks Dakikası</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>⏳ Geri Kazanılan Zaman</h2>
+        <div id="savedBox"></div>
+      </div>
+      <div class="card">
+        <h2>🏷️ Dürtü Analizi</h2>
+        <div id="trigBox"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>📅 Ay Görünümü</h2>
+        <div id="heatBox"></div>
+      </div>
+      <div class="card">
+        <h2>🗒️ Haftalık Rapor</h2>
+        <div id="weekBox"></div>
+      </div>
     </div>
     <div class="card">
       <h2>⚖️ Dünya ile Kıyas</h2>
@@ -457,6 +528,14 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
   <div class="bCircleWrap"><div class="bRing"></div><div id="bCircle"></div></div>
   <div id="bPhase">Hazır ol...</div>
   <div id="bCycle"></div>
+  <div id="bTags" style="display:none;flex-wrap:wrap;gap:8px;justify-content:center;max-width:460px">
+    <button class="tagBtn" onclick="tagUrge('sikinti')">🥱 Can sıkıntısı</button>
+    <button class="tagBtn" onclick="tagUrge('kaygi')">😰 Kaygı/stres</button>
+    <button class="tagBtn" onclick="tagUrge('aliskanlik')">🔁 Alışkanlık</button>
+    <button class="tagBtn" onclick="tagUrge('bildirim')">🔔 Bildirim</button>
+    <button class="tagBtn" onclick="tagUrge('sosyal')">👥 Sosyal ortam</button>
+    <button class="tagBtn ghost" onclick="tagUrge(null)">Geç →</button>
+  </div>
   <button class="btn ghost" onclick="stopBreath(false)">Bırak</button>
 </div>
 
@@ -487,7 +566,7 @@ footer{text-align:center;color:#4a6b60;font-size:.75rem;margin-top:30px}
 /* =================== VERİ =================== */
 const LS='detoks-bahcesi-v1';
 let D=null;
-function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null} if(D&&!D.cards)D.cards=[]}
+function load(){try{D=JSON.parse(localStorage.getItem(LS))||null}catch(e){D=null} if(D){if(!D.cards)D.cards=[];if(!D.urgeLog)D.urgeLog=[];if(D.totals.roul==null)D.totals.roul=0}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem(LS,JSON.stringify(D))}
 function dkey(d=new Date()){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
@@ -566,6 +645,8 @@ const ACH=[
  {id:'a13',ico:'🧠', n:'Meraklı Zihin',     d:'10 bilgi kartı oku',                  c:()=>D.cards.length>=10},
  {id:'a14',ico:'🦉', n:'Bilge Baykuş',      d:'30 kartın hepsini oku',               c:()=>D.cards.length>=30},
  {id:'a15',ico:'🌅', n:'Niyetli Sabahlar',  d:'7 sabah niyeti yaz',                  c:()=>Object.values(D.days).filter(x=>x.intent).length>=7},
+ {id:'a16',ico:'🏷️', n:'Dürtü Dedektifi',  d:'10 dürtü etiketle',                   c:()=>D.urgeLog.length>=10},
+ {id:'a17',ico:'🎡', n:'Çark Ustası',       d:'Ruletten 10 aktivite tamamla',        c:()=>D.totals.roul>=10},
 ];
 function checkAch(){
   ACH.forEach(a=>{
@@ -691,7 +772,7 @@ function renderGarden(){
     fh+='<circle class="fly" cx="'+(30+r*940).toFixed(0)+'" cy="'+(40+r2*200).toFixed(0)+'" r="2.2" fill="#ffe9a3" style="animation-delay:'+(r*6).toFixed(1)+'s"/>';
   }
   f.innerHTML=fh;
-  renderWeeds();renderOwl();
+  renderWeeds();renderOwl();renderPond();renderCritters();renderSeason();
 }
 function renderStars(){
   const g=document.getElementById('gStars');let h='';
@@ -820,6 +901,205 @@ function toggleKart(i){
   }else{el.classList.toggle('open')}
 }
 
+/* =================== BAHÇE EVRİMİ =================== */
+function renderPond(){
+  const g=document.getElementById('gPond');
+  if(streak()<30){g.innerHTML='';return}
+  g.innerHTML='<ellipse cx="600" cy="428" rx="90" ry="18" fill="#123c52"/>'
+    +'<ellipse cx="600" cy="428" rx="90" ry="18" fill="none" stroke="#1d5a78" stroke-width="2"/>'
+    +'<ellipse class="shimmer" cx="578" cy="424" rx="26" ry="4" fill="#7ec8e8"/>'
+    +'<ellipse cx="632" cy="432" rx="10" ry="2.2" fill="#f5e9c9" opacity=".35"/>';
+}
+function renderCritters(){
+  const g=document.getElementById('gCritters'),s=streak();let h='';
+  if(s>=7){ /* kelebekler */
+    const bc=['#e8a1c4','#9fc8ff','#ffd28a'];
+    for(let i=0;i<3;i++){
+      const r=Math.abs(Math.sin(i*57.7))%1;
+      h+='<g transform="translate('+(250+r*500).toFixed(0)+','+(328+i*24)+')"><g class="flit" style="animation-delay:'+(i*1.7)+'s">'
+        +'<g class="flap"><ellipse cx="-4" cy="0" rx="5" ry="7" fill="'+bc[i]+'" opacity=".9"/><ellipse cx="4" cy="0" rx="5" ry="7" fill="'+bc[i]+'" opacity=".9"/></g>'
+        +'<rect x="-1" y="-5" width="2" height="10" rx="1" fill="#4a3826"/></g></g>';
+    }
+  }
+  if(s>=14){ /* kuşlar */
+    for(let i=0;i<3;i++){
+      h+='<g transform="translate(-70,'+(66+i*36)+')"><g class="birdfly" style="animation-delay:-'+(i*9)+'s;animation-duration:'+(26+i*8)+'s">'
+        +'<path d="M-8,0 Q-4,-6 0,0 Q4,-6 8,0" stroke="#c9d8e8" stroke-width="2" fill="none" stroke-linecap="round"/></g></g>';
+    }
+  }
+  if(s>=21){ /* geyik */
+    h+='<g transform="translate(878,406)"><g class="deerBob">'
+      +'<ellipse cx="0" cy="1" rx="24" ry="5" fill="#0a1c14"/>'
+      +'<path d="M-14,0 L-14,-22 M-6,0 L-6,-22 M8,0 L8,-22 M15,0 L15,-22" stroke="#6e523a" stroke-width="3.4" stroke-linecap="round"/>'
+      +'<ellipse cx="0" cy="-28" rx="20" ry="10" fill="#8a6a4a"/>'
+      +'<path d="M16,-32 Q22,-44 20,-52" stroke="#8a6a4a" stroke-width="7" fill="none" stroke-linecap="round"/>'
+      +'<ellipse cx="21" cy="-55" rx="6.5" ry="5" fill="#8a6a4a"/>'
+      +'<circle cx="23" cy="-56.5" r="1.1" fill="#221a12"/>'
+      +'<path d="M19,-60 L15,-70 M19,-60 L21,-72 M15,-70 L11,-74 M21,-72 L25,-76" stroke="#6e523a" stroke-width="2" fill="none" stroke-linecap="round"/>'
+      +'<path d="M-19,-30 Q-24,-27 -21,-23" stroke="#8a6a4a" stroke-width="4" fill="none" stroke-linecap="round"/>'
+      +'</g></g>';
+  }
+  g.innerHTML=h;
+}
+function renderSeason(){
+  const g=document.getElementById('gSeason'),m=new Date().getMonth()+1;let h='';
+  if(m===12||m<=2){ /* kış: kar */
+    for(let i=0;i<26;i++){
+      const r=Math.abs(Math.sin(i*37.3))%1,r2=Math.abs(Math.sin(i*89.1))%1;
+      h+='<circle class="snow" cx="'+(r*1000).toFixed(0)+'" cy="0" r="'+(1.4+r2*1.8).toFixed(1)+'" fill="#e8f0f8" opacity=".8" style="animation-delay:-'+(r2*9).toFixed(1)+'s;animation-duration:'+(7+r*6).toFixed(1)+'s"/>';
+    }
+    h+='<path d="M0,318 Q220,258 470,305 T1000,295 L1000,306 Q750,303 470,316 Q220,269 0,329 Z" fill="#dce8f2" opacity=".22"/>';
+  }else if(m>=3&&m<=5){ /* ilkbahar: kır çiçekleri */
+    const fc=['#e8a1c4','#ffd28a','#c9a1e8','#ff9fb0'];
+    for(let i=0;i<14;i++){
+      const r=Math.abs(Math.sin(i*63.1))%1,r2=Math.abs(Math.sin(i*29.7))%1;
+      h+='<g transform="translate('+(60+r*880).toFixed(0)+','+(345+r2*75).toFixed(0)+') scale('+(0.5+r2*0.4).toFixed(2)+')"><rect x="-1" y="-8" width="2" height="8" fill="#4a7a4a"/><circle cx="0" cy="-10" r="3.4" fill="'+fc[i%4]+'"/><circle cx="0" cy="-10" r="1.4" fill="#fff3c4"/></g>';
+    }
+  }else if(m>=9&&m<=11){ /* sonbahar: düşen yapraklar */
+    for(let i=0;i<14;i++){
+      const r=Math.abs(Math.sin(i*47.9))%1,r2=Math.abs(Math.sin(i*71.3))%1;
+      h+='<ellipse class="fallLeaf" cx="'+(r*1000).toFixed(0)+'" cy="0" rx="3.4" ry="2" fill="'+(r2>0.5?'#c98a3f':'#a8623f')+'" style="animation-delay:-'+(r2*11).toFixed(1)+'s;animation-duration:'+(9+r*6).toFixed(1)+'s"/>';
+    }
+  } /* yaz: ateş böcekleri zaten sahnede */
+  g.innerHTML=h;
+}
+
+/* =================== AKTİVİTE RULETİ =================== */
+const ACT=['💧 Bir bardak su iç','🤸 10 esneme/şınav','🪟 2 dk pencereden bak','🚶 Kısa yürüyüşe çık','📞 Sevdiğin birini ara','📖 10 sayfa kitap oku','🧹 5 dakika ortalık topla','✍️ Aklındakini yaz','🍵 Çay/kahve demle','🎧 Gözler kapalı 1 şarkı','🛁 Yüzünü yıka','🧘 1 dk derin nefes'];
+let wheelRot=0,wheelIdx=null,spinning=false;
+function buildWheel(){
+  const g=document.getElementById('wheelG'),C=140,R=132,cols=['#16382d','#132b3a'];let h='';
+  for(let i=0;i<12;i++){
+    const a1=(i*30-90)*Math.PI/180,a2=((i+1)*30-90)*Math.PI/180;
+    const x1=C+R*Math.cos(a1),y1=C+R*Math.sin(a1),x2=C+R*Math.cos(a2),y2=C+R*Math.sin(a2);
+    h+='<path d="M'+C+','+C+' L'+x1.toFixed(1)+','+y1.toFixed(1)+' A'+R+','+R+' 0 0 1 '+x2.toFixed(1)+','+y2.toFixed(1)+' Z" fill="'+cols[i%2]+'" stroke="#0a1a20" stroke-width="1.5"/>';
+    const am=(i*30-75)*Math.PI/180,tx=C+R*0.7*Math.cos(am),ty=C+R*0.7*Math.sin(am);
+    h+='<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="18">'+ACT[i].split(' ')[0]+'</text>';
+  }
+  h+='<circle cx="140" cy="140" r="20" fill="#0e2229" stroke="#2a7a55" stroke-width="2"/><text x="140" y="142" text-anchor="middle" dominant-baseline="middle" font-size="15">🌱</text>';
+  g.innerHTML=h;
+}
+function spinWheel(){
+  if(spinning)return;spinning=true;
+  document.getElementById('didBtn').style.display='none';
+  document.getElementById('wheelResult').textContent='🌀 dönüyor...';
+  wheelIdx=Math.floor(Math.random()*12);
+  const base=Math.ceil(wheelRot/360)*360;
+  wheelRot=base+360*4+(360-(wheelIdx*30+15));
+  document.getElementById('wheelG').style.transform='rotate('+wheelRot+'deg)';
+  sndSoft();
+  setTimeout(()=>{
+    spinning=false;
+    document.getElementById('wheelResult').innerHTML='<b>'+ACT[wheelIdx]+'</b>';
+    document.getElementById('didBtn').style.display='inline-block';
+    sndOk();
+  },4150);
+}
+function rouletteDone(){
+  document.getElementById('didBtn').style.display='none';
+  const d=day();d.roul=(d.roul||0)+1;D.totals.roul++;save();
+  if(d.roul<=3)addXP(10,'Aktivite tamam 🎡');
+  else{toast('Süper! Günlük rulet XP sınırı doldu ama bahçen gurur duyuyor 🌿');checkAch()}
+}
+
+/* =================== GERİ KAZANILAN ZAMAN =================== */
+function renderSaved(){
+  const box=document.getElementById('savedBox');
+  const logged=Object.entries(D.days).filter(([k,d])=>d.screen!=null);
+  if(!logged.length){box.innerHTML='<p class="muted">Ekran süresi girdikçe, başlangıç ortalamana göre geri kazandığın zaman burada birikecek.</p>';return}
+  let tot=0,ay=0;const mk=dkey().slice(0,7);
+  logged.forEach(([k,d])=>{const s=Math.max(0,D.plan.baseline-d.screen);tot+=s;if(k.slice(0,7)===mk)ay+=s});
+  const parts=[];
+  if(Math.floor(tot/360)>0)parts.push('📚 ~'+Math.floor(tot/360)+' kitap');
+  if(Math.floor(tot/120)>0)parts.push('🎬 ~'+Math.floor(tot/120)+' film');
+  if(Math.floor(tot/45)>0)parts.push('🚶 ~'+Math.floor(tot/45)+' yürüyüş');
+  box.innerHTML='<div class="targetBig" style="padding:4px 0 10px"><div class="v" style="color:var(--leaf)">'+fmtMin(tot)+'</div><div class="l">eski ortalamana ('+fmtMin(D.plan.baseline)+') göre geri kazandığın toplam zaman</div></div>'
+    +'<p class="muted">Bu ay: <b>'+fmtMin(ay)+'</b></p>'
+    +(parts.length?'<p class="muted" style="margin-top:6px">Bu zamana sığanlar: '+parts.join(' · ')+'</p>':'');
+}
+
+/* =================== DÜRTÜ ANALİZİ =================== */
+const TRIG={sikinti:['🥱','Can sıkıntısı'],kaygi:['😰','Kaygı/stres'],aliskanlik:['🔁','Alışkanlık'],bildirim:['🔔','Bildirim'],sosyal:['👥','Sosyal ortam']};
+function renderTrig(){
+  const box=document.getElementById('trigBox');
+  if(!D.urgeLog.length){box.innerHTML='<p class="muted">Dürtü egzersizinden sonra tetikleyiciyi etiketle — birkaç etiketten sonra seni ekrana neyin ittiğini burada göreceksin.</p>';return}
+  const cnt={};D.urgeLog.forEach(u=>cnt[u.tag]=(cnt[u.tag]||0)+1);
+  const tot=D.urgeLog.length,max=Math.max(...Object.values(cnt));
+  let h='';
+  Object.entries(cnt).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const t=TRIG[k]||['🏷️',k];
+    h+='<div class="cmpRow"><div class="l"><b>'+t[0]+' '+t[1]+'</b><span>'+v+' ('+Math.round(v/tot*100)+'%)</span></div><div class="cmpBar"><i style="width:'+(v/max*100).toFixed(0)+'%;background:linear-gradient(90deg,#2b5f8a,#3f8cae)"></i></div></div>';
+  });
+  const buckets={'🌅 Sabah (06-12)':0,'☀️ Öğlen (12-17)':0,'🌆 Akşam (17-22)':0,'🌙 Gece (22-06)':0};
+  D.urgeLog.forEach(u=>{const hh=new Date(u.ts).getHours();
+    if(hh>=6&&hh<12)buckets['🌅 Sabah (06-12)']++;
+    else if(hh>=12&&hh<17)buckets['☀️ Öğlen (12-17)']++;
+    else if(hh>=17&&hh<22)buckets['🌆 Akşam (17-22)']++;
+    else buckets['🌙 Gece (22-06)']++});
+  const top=Object.entries(buckets).sort((a,b)=>b[1]-a[1])[0];
+  h+='<p class="muted" style="margin-top:8px">En riskli zaman dilimin: <b>'+top[0]+'</b> — o saatlerde telefonu uzağa koy.</p>';
+  box.innerHTML=h;
+}
+
+/* =================== AY GÖRÜNÜMÜ =================== */
+let heatOff=0;
+function heatNav(d){heatOff=Math.min(0,heatOff+d);renderHeat()}
+function renderHeat(){
+  const box=document.getElementById('heatBox');
+  const now=new Date(),m=new Date(now.getFullYear(),now.getMonth()+heatOff,1);
+  const ayAd=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const dim=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();
+  const pad=(m.getDay()+6)%7,tk=dkey();
+  let h='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<button class="btn ghost" style="padding:4px 12px" onclick="heatNav(-1)">‹</button>'
+    +'<b>'+ayAd[m.getMonth()]+' '+m.getFullYear()+'</b>'
+    +'<button class="btn ghost" style="padding:4px 12px" onclick="heatNav(1)">›</button></div>';
+  h+='<div class="heatGrid">';
+  ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].forEach(g=>h+='<div class="hlbl">'+g+'</div>');
+  for(let i=0;i<pad;i++)h+='<div></div>';
+  for(let d=1;d<=dim;d++){
+    const k=m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const rec=D.days[k];let cls='';
+    if(rec&&rec.screen!=null)cls=rec.success?' ok':' over';
+    h+='<div class="hcell'+cls+(k===tk?' today':'')+'">'+d+'</div>';
+  }
+  h+='</div>';
+  box.innerHTML=h;
+}
+
+/* =================== HAFTALIK RAPOR =================== */
+function renderWeek(){
+  const box=document.getElementById('weekBox');
+  const mon=d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+  const thisMon=mon(new Date()),lastMon=new Date(thisMon);lastMon.setDate(lastMon.getDate()-7);
+  const stats=start=>{
+    const r={scr:[],suc:0,urg:0,det:0};
+    for(let i=0;i<7;i++){
+      const x=new Date(start);x.setDate(x.getDate()+i);const d=D.days[dkey(x)];if(!d)continue;
+      if(d.screen!=null){r.scr.push(d.screen);if(d.success)r.suc++}
+      r.urg+=d.urges||0;r.det+=d.detox||0;
+    }
+    r.avg=r.scr.length?Math.round(r.scr.reduce((a,b)=>a+b,0)/r.scr.length):null;
+    return r;
+  };
+  const t=stats(thisMon),l=stats(lastMon);
+  const row=(n,a,b)=>'<tr><td>'+n+'</td><td>'+a+'</td><td>'+b+'</td></tr>';
+  let h='<table class="wtab"><tr><th></th><th>Bu hafta</th><th>Geçen</th></tr>'
+    +row('Ekran ort.',t.avg!=null?fmtMin(t.avg):'–',l.avg!=null?fmtMin(l.avg):'–')
+    +row('Yeşil gün 🌱',t.suc,l.suc)
+    +row('Yenilen dürtü 🌊',t.urg,l.urg)
+    +row('Detoks dk 🕯️',t.det,l.det)+'</table>';
+  if(t.avg!=null&&l.avg!=null){
+    h+='<p class="muted" style="margin-top:10px">'+(t.avg<l.avg
+      ?'🌱 Geçen haftadan <b>'+fmtMin(l.avg-t.avg)+'</b> daha az ekrandasın — dalga senin!'
+      :t.avg>l.avg?'🍂 Geçen haftadan <b>'+fmtMin(t.avg-l.avg)+'</b> fazla — yeni hafta, yeni dalga.'
+      :'⚖️ Geçen haftayla başa baş.')+'</p>';
+  }else{
+    h+='<p class="muted" style="margin-top:10px">Kıyas için iki haftalık veri birikmesi gerek.</p>';
+  }
+  box.innerHTML=h;
+}
+
 /* =================== SABAH NİYETİ =================== */
 let intentEditing=false;
 function renderIntent(){
@@ -902,13 +1182,19 @@ function finishBreath(){
   bAlive=false;clearTimeout(bTimer);
   day().urges++;D.totals.urges++;save();
   document.getElementById('bPhase').textContent='Dalga geçti 🌊';
-  const tips=['Şimdi bir bardak su iç 💧','Şimdi pencereden dışarı bak 🌤️','Şimdi 10 squat yap 💪','Şimdi aklındakini kâğıda yaz ✍️'];
-  document.getElementById('bCycle').textContent=tips[Math.floor(Math.random()*tips.length)];
+  document.getElementById('bCycle').textContent='Peki bu dürtü neden geldi?';
   sndOk();addXP(15,'Dürtü yenildi 🌊');
-  setTimeout(()=>stopBreath(true),2400);
+  document.getElementById('bTags').style.display='flex';
+}
+function tagUrge(tag){
+  if(tag){D.urgeLog.push({ts:Date.now(),tag});save()}
+  const tips=['Şimdi bir bardak su iç 💧','Şimdi pencereden dışarı bak 🌤️','Şimdi 10 squat yap 💪','Şimdi aklındakini kâğıda yaz ✍️'];
+  toast((tag?'Etiket kaydedildi 🏷️ — ':'')+tips[Math.floor(Math.random()*tips.length)]);
+  stopBreath(true);
 }
 function stopBreath(done){
   bAlive=false;clearTimeout(bTimer);
+  document.getElementById('bTags').style.display='none';
   document.getElementById('breathOverlay').classList.remove('on');
   document.getElementById('bCircle').style.transform='scale(1)';
   document.getElementById('bPhase').textContent='Hazır ol...';
@@ -1008,6 +1294,7 @@ function renderStats(){
   document.getElementById('sSuccess').textContent=successCount();
   document.getElementById('sUrges').textContent=D.totals.urges;
   document.getElementById('sDetox').textContent=D.totals.detox;
+  renderSaved();renderTrig();renderHeat();renderWeek();
   renderCompare();
   renderChart();
 }
@@ -1050,8 +1337,8 @@ function finishOnboarding(){
   const g=Math.round(parseFloat(document.getElementById('obGoal').value)*60);
   const w=parseInt(document.getElementById('obWeeks').value);
   if(!b||!g||g>=b){toast('Hedef, şu anki süreden küçük olmalı 🙂');return}
-  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],cards:[],
-     totals:{urges:0,detox:0},session:null,sound:true,reason:document.getElementById('obReason').value.trim()};
+  D={plan:{baseline:b,goal:g,weeks:w,start:dkey()},days:{},garden:[],xp:0,ach:[],cards:[],urgeLog:[],
+     totals:{urges:0,detox:0,roul:0},session:null,sound:true,reason:document.getElementById('obReason').value.trim()};
   save();
   document.getElementById('obModal').classList.remove('on');
   toast('🌱 Bahçen kuruldu. İlk hedefin: günde '+fmtMin(targetFor(dkey())));
@@ -1061,6 +1348,7 @@ function finishOnboarding(){
 /* =================== BAŞLAT =================== */
 load();
 renderStars();
+buildWheel();
 document.getElementById('gOwl').addEventListener('click',owlClick);
 if(!D){document.getElementById('obModal').classList.add('on')}
 else{

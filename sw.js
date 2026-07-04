@@ -1,5 +1,5 @@
 /* Detoks Bahçesi — service worker: ağ öncelikli, çevrimdışıysa önbellekten */
-const CACHE = 'detoks-bahcesi-v2';
+const CACHE = 'detoks-bahcesi-v3';
 const ASSETS = ['./', './index.html', './durtu.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './icon-durtu-180.png'];
 
 self.addEventListener('install', e => {
